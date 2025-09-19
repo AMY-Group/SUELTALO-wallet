@@ -1,7 +1,7 @@
 import { Keypair, PublicKey } from '@solana/web3.js';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as SecureStore from 'expo-secure-store';
-import * as bip39 from 'react-native-bip39';
+import * as bip39 from 'bip39';
 
 export interface WalletData {
   keypair: Keypair;
