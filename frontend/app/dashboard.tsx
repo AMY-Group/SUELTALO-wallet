@@ -226,6 +226,145 @@ export default function DashboardScreen() {
                 <Text style={styles.debugCardLabel}>SOL</Text>
               </View>
             </View>
+
+            {/* ORIGINAL CONTENT - NEON GLOWING BALANCE CARDS */}
+            <Animated.View style={[styles.balancesSection, { opacity: fadeAnim, transform: [{ scale: bounceAnim }] }]}>
+              <Text style={styles.sectionTitle}>Tu Lana 💰</Text>
+              
+              {/* USDC Card - Electric Blue Glow */}
+              <Animated.View style={[styles.neonCard, styles.usdcCard]}>
+                <LinearGradient
+                  colors={['rgba(30, 144, 255, 0.3)', 'rgba(30, 144, 255, 0.1)']}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 1 }}
+                  style={styles.cardGradient}
+                >
+                  <View style={styles.cardHeader}>
+                    <View style={styles.cardIcon}>
+                      <Text style={styles.cardEmoji}>💵</Text>
+                    </View>
+                    <Text style={styles.cardTitle}>USDC</Text>
+                  </View>
+                  <Text style={styles.cardAmount}>${formatAmount(balances.USDC, 2)}</Text>
+                  <Text style={styles.cardSubtitle}>Tu lana digital</Text>
+                </LinearGradient>
+              </Animated.View>
+
+              {/* SLT Card - Neon Magenta Glow */}
+              <Animated.View style={[styles.neonCard, styles.sltCard]}>
+                <LinearGradient
+                  colors={['rgba(255, 0, 110, 0.3)', 'rgba(255, 0, 110, 0.1)']}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 1 }}
+                  style={styles.cardGradient}
+                >
+                  <View style={styles.cardHeader}>
+                    <View style={styles.cardIcon}>
+                      <Text style={styles.cardEmoji}>🎁</Text>
+                    </View>
+                    <Text style={styles.cardTitle}>SLT</Text>
+                  </View>
+                  <Text style={styles.cardAmount}>{formatAmount(balances.SLT)}</Text>
+                  <Text style={styles.cardSubtitle}>Premios ganados</Text>
+                </LinearGradient>
+              </Animated.View>
+
+              {/* SOL Card - Neon Green Glow */}
+              <Animated.View style={[styles.neonCard, styles.solCard]}>
+                <LinearGradient
+                  colors={['rgba(0, 255, 136, 0.3)', 'rgba(0, 255, 136, 0.1)']}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 1 }}
+                  style={styles.cardGradient}
+                >
+                  <View style={styles.cardHeader}>
+                    <View style={styles.cardIcon}>
+                      <Text style={styles.cardEmoji}>⚡</Text>
+                    </View>
+                    <Text style={styles.cardTitle}>SOL</Text>
+                  </View>
+                  <Text style={styles.cardAmount}>{formatAmount(balances.SOL)}</Text>
+                  <Text style={styles.cardSubtitle}>Para los fees</Text>
+                </LinearGradient>
+              </Animated.View>
+            </Animated.View>
+
+            {/* Big Neon Action Buttons */}
+            <Animated.View style={[styles.actionsSection, { opacity: fadeAnim }]}>
+              <TouchableOpacity style={styles.bigActionButton} onPress={handleSend}>
+                <LinearGradient
+                  colors={['#1E90FF', '#00BFFF']}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 1 }}
+                  style={styles.bigButtonGradient}
+                >
+                  <Text style={styles.bigButtonEmoji}>💸</Text>
+                  <Text style={styles.bigButtonText}>Enviar</Text>
+                  <Text style={styles.bigButtonSubtext}>Manda lana al toque</Text>
+                </LinearGradient>
+              </TouchableOpacity>
+
+              <TouchableOpacity style={styles.bigActionButton} onPress={handleReceive}>
+                <LinearGradient
+                  colors={['#FF006E', '#FF4081']}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 1 }}
+                  style={styles.bigButtonGradient}
+                >
+                  <Text style={styles.bigButtonEmoji}>📥</Text>
+                  <Text style={styles.bigButtonText}>Recibir</Text>
+                  <Text style={styles.bigButtonSubtext}>Cobra sin broncas</Text>
+                </LinearGradient>
+              </TouchableOpacity>
+
+              <TouchableOpacity style={styles.bigActionButton} onPress={handleRewards}>
+                <LinearGradient
+                  colors={['#00FF88', '#4CAF50']}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 1 }}
+                  style={styles.bigButtonGradient}
+                >
+                  <Text style={styles.bigButtonEmoji}>🎉</Text>
+                  <Text style={styles.bigButtonText}>Rewards</Text>
+                  <Text style={styles.bigButtonSubtext}>Gana premios SLT</Text>
+                </LinearGradient>
+              </TouchableOpacity>
+            </Animated.View>
+
+            {/* Recent Activity */}
+            {transactions.length > 0 && (
+              <Animated.View style={[styles.activitySection, { opacity: fadeAnim }]}>
+                <View style={styles.activityHeader}>
+                  <Text style={styles.sectionTitle}>Movimientos Recientes</Text>
+                  <TouchableOpacity onPress={handleTransactions}>
+                    <Text style={styles.viewAllText}>Ver todo</Text>
+                  </TouchableOpacity>
+                </View>
+                
+                <View style={styles.quickActivity}>
+                  {transactions.slice(0, 3).map((tx, index) => (
+                    <View key={tx.id} style={styles.activityItem}>
+                      <View style={styles.activityIcon}>
+                        <Text style={styles.activityEmoji}>
+                          {tx.from_address === walletData?.publicKey ? '↗️' : '↙️'}
+                        </Text>
+                      </View>
+                      <View style={styles.activityDetails}>
+                        <Text style={styles.activityType}>
+                          {tx.from_address === walletData?.publicKey ? 'Mandaste' : 'Te llegó'} {tx.token_type}
+                        </Text>
+                        <Text style={styles.activityAmount}>
+                          {tx.from_address === walletData?.publicKey ? '-' : '+'}
+                          {formatAmount(tx.amount)} {tx.token_type}
+                        </Text>
+                      </View>
+                    </View>
+                  ))}
+                </View>
+              </Animated.View>
+            )}
+          </ScrollView>
+        </View>
         {/* Neon Glowing Balance Cards */}
         <Animated.View style={[styles.balancesSection, { opacity: fadeAnim, transform: [{ scale: bounceAnim }] }]}>
           <Text style={styles.sectionTitle}>Tu Lana 💰</Text>
