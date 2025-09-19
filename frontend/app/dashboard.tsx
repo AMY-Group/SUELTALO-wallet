@@ -501,7 +501,8 @@ export default function DashboardScreen() {
             </View>
           </Animated.View>
         )}
-        </ScrollView>
+          </ScrollView>
+        </View>
 
         {/* Bottom Navigation with Neon Icons */}
         <View style={styles.bottomNav}>
