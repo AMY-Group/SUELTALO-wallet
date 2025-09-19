@@ -27,7 +27,7 @@ const { width } = Dimensions.get('window');
 interface Balance {
   SOL: number;
   USDC: number;
-  SLT: number;
+  SLT: number | null;
 }
 
 interface Transaction {
