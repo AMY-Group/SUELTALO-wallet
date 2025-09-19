@@ -143,7 +143,7 @@ export default function WelcomeScreen() {
                 end={{ x: 1, y: 0 }}
                 style={styles.gradientButton}
               >
-                <Ionicons name="arrow-forward" size={24} color="#FFFFFF" style={styles.buttonIcon} />
+                <Text style={styles.buttonIcon}>➡️</Text>
                 <Text style={styles.primaryButtonText}>Ver mi lana</Text>
               </LinearGradient>
             </TouchableOpacity>
