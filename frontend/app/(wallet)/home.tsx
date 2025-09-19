@@ -124,12 +124,52 @@ export default function DashboardScreen() {
     }
   };
 
-  const loadBalances = async (publicKey: string) => {
+  const loadDevnetBalances = async (publicKeyString: string) => {
     try {
-      const balanceData = await ApiService.getWalletBalance(publicKey);
-      setBalances(balanceData.balances);
+      const pubkey = new PublicKey(publicKeyString);
+      
+      // Get SOL balance
+      const solBalance = await connection.getBalance(pubkey);
+      const solAmount = solBalance / LAMPORTS_PER_SOL;
+      
+      // Get USDC balance
+      let usdcAmount = 0;
+      try {
+        const usdcMint = new PublicKey(USDC_MINT);
+        const usdcATA = await getAssociatedTokenAddress(usdcMint, pubkey);
+        const usdcAccount = await getAccount(connection, usdcATA);
+        usdcAmount = Number(usdcAccount.amount) / Math.pow(10, 6); // USDC has 6 decimals
+      } catch (error) {
+        console.log('USDC account not found or error:', error);
+        usdcAmount = 0;
+      }
+      
+      // Get SLT balance
+      let sltAmount: number | null = null;
+      if (SLT_MINT) {
+        try {
+          const sltMint = new PublicKey(SLT_MINT);
+          const sltATA = await getAssociatedTokenAddress(sltMint, pubkey);
+          const sltAccount = await getAccount(connection, sltATA);
+          sltAmount = Number(sltAccount.amount) / Math.pow(10, 6); // Assuming 6 decimals for SLT
+        } catch (error) {
+          console.log('SLT account not found or error:', error);
+          sltAmount = 0;
+        }
+      }
+      
+      const newBalances = {
+        SOL: solAmount,
+        USDC: usdcAmount,
+        SLT: sltAmount,
+      };
+      
+      setBalances(newBalances);
+      console.info('DASHBOARD_DATA_OK', { sol: solAmount, usdc: usdcAmount, slt: sltAmount });
+      
     } catch (error) {
-      console.error('Error loading balances:', error);
+      console.error('Error loading Devnet balances:', error);
+      Alert.alert('Error', 'No pudimos cargar los balances desde Devnet');
     }
   };
 
