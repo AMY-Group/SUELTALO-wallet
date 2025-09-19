@@ -22,10 +22,29 @@ if (typeof process === 'undefined') {
 process.browser = false;
 if (typeof Buffer === 'undefined') global.Buffer = require('buffer').Buffer;
 
-// Fix for Solana web3.js
+// Fix for text encoding
 if (typeof global.TextEncoder === 'undefined') {
   global.TextEncoder = require('text-encoding').TextEncoder;
 }
 if (typeof global.TextDecoder === 'undefined') {
   global.TextDecoder = require('text-encoding').TextDecoder;
+}
+
+// Fix for crypto randomBytes
+import { getRandomValues } from 'react-native-get-random-values';
+
+const crypto = {
+  getRandomValues: getRandomValues,
+  randomBytes: (size) => {
+    const array = new Uint8Array(size);
+    getRandomValues(array);
+    return Buffer.from(array);
+  }
+};
+
+global.crypto = crypto;
+
+// Override the react-native-randombytes seed
+if (global.rn_randombytes_seed) {
+  global.rn_randombytes_seed(crypto.randomBytes(64));
 }
