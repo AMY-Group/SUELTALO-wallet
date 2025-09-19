@@ -70,17 +70,17 @@ export default function SendScreen() {
 
   const validateInputs = () => {
     if (!recipientAddress.trim()) {
-      Alert.alert('Error', 'Por favor ingresa la dirección del destinatario');
+      Alert.alert('¡Órale!', 'Ponle la dirección de a quién le vas a mandar');
       return false;
     }
 
     if (!WalletService.validatePublicKey(recipientAddress)) {
-      Alert.alert('Error', 'Dirección del destinatario inválida');
+      Alert.alert('¡Esa dirección no está bien!', 'Revísala otra vez o escanea el código QR');
       return false;
     }
 
     if (!amount || parseFloat(amount) <= 0) {
-      Alert.alert('Error', 'Por favor ingresa una cantidad válida');
+      Alert.alert('¿Cuánto vas a mandar?', 'Ponle una cantidad válida');
       return false;
     }
 
@@ -88,7 +88,7 @@ export default function SendScreen() {
     const availableBalance = balances[selectedToken as keyof typeof balances];
     
     if (amountNum > availableBalance) {
-      Alert.alert('Error', `Saldo insuficiente de ${selectedToken}`);
+      Alert.alert('¡Te falta lana!', `No tienes suficientes ${selectedToken} en tu billetera`);
       return false;
     }
 
@@ -123,15 +123,15 @@ export default function SendScreen() {
       ]).start();
 
       Alert.alert(
-        '¡Transacción Enviada! 🚀',
-        `Enviando ${amount} ${selectedToken} a ${recipientAddress.slice(0, 8)}...${recipientAddress.slice(-8)}`,
+        '¡Órale! Tu lana ya salió 🚀',
+        `Mandaste ${amount} ${selectedToken} al toque`,
         [
           {
-            text: 'Ver Transacción',
+            text: 'Ver movimiento',
             onPress: () => router.push('/transactions'),
           },
           {
-            text: 'Continuar',
+            text: 'Dale',
             onPress: () => router.back(),
           },
         ]
@@ -142,7 +142,7 @@ export default function SendScreen() {
       setAmount('');
     } catch (error) {
       console.error('Send error:', error);
-      Alert.alert('Error', 'Error al enviar la transacción. Intenta de nuevo.');
+      Alert.alert('¡No se pudo!', 'Algo pasó, inténtalo otra vez');
     } finally {
       setLoading(false);
     }
@@ -158,9 +158,9 @@ export default function SendScreen() {
   };
 
   const tokenOptions = [
-    { symbol: 'USDC', name: 'Dólares Digitales', icon: 'card', color: '#1E90FF', gradient: ['#1E90FF', '#00BFFF'] },
-    { symbol: 'SOL', name: 'Solana', icon: 'flash', color: '#9945FF', gradient: ['#9945FF', '#BB86FC'] },
-    { symbol: 'SLT', name: 'SUÉLTALO Token', icon: 'gift', color: '#00FF88', gradient: ['#00FF88', '#4CAF50'] },
+    { symbol: 'USDC', name: 'Dólares digitales', icon: 'card', color: '#1E90FF', gradient: ['#1E90FF', '#00BFFF'] },
+    { symbol: 'SOL', name: 'Para fees', icon: 'flash', color: '#9945FF', gradient: ['#9945FF', '#BB86FC'] },
+    { symbol: 'SLT', name: 'Premios ganados', icon: 'gift', color: '#00FF88', gradient: ['#00FF88', '#4CAF50'] },
   ];
 
   return (
@@ -182,7 +182,7 @@ export default function SendScreen() {
             <Ionicons name="arrow-back" size={28} color="#FFFFFF" />
           </TouchableOpacity>
           
-          <Text style={styles.headerTitle}>Enviar Crypto</Text>
+          <Text style={styles.headerTitle}>Mandar Lana 💸</Text>
           
           <TouchableOpacity style={styles.scanButton} onPress={handleScanQR}>
             <Ionicons name="qr-code-outline" size={28} color="#FFFFFF" />
@@ -197,7 +197,7 @@ export default function SendScreen() {
         <ScrollView style={styles.scrollContainer} showsVerticalScrollIndicator={false}>
           {/* Urban Token Selection */}
           <Animated.View style={[styles.section, { opacity: fadeAnim, transform: [{ translateY: slideAnim }] }]}>
-            <Text style={styles.sectionTitle}>💰 Seleccionar Token</Text>
+            <Text style={styles.sectionTitle}>¿Qué vas a mandar? 💰</Text>
             <View style={styles.tokenGrid}>
               {tokenOptions.map((token) => (
                 <TouchableOpacity
@@ -245,7 +245,7 @@ export default function SendScreen() {
 
           {/* Neon Recipient Address */}
           <Animated.View style={[styles.section, { opacity: fadeAnim, transform: [{ translateY: slideAnim }] }]}>
-            <Text style={styles.sectionTitle}>📍 Dirección del Destinatario</Text>
+            <Text style={styles.sectionTitle}>¿A quién le mandas? 📍</Text>
             <View style={styles.neonInputContainer}>
               <LinearGradient
                 colors={recipientAddress ? ['rgba(30, 144, 255, 0.2)', 'rgba(255, 0, 110, 0.2)'] : ['rgba(255, 255, 255, 0.05)', 'rgba(255, 255, 255, 0.02)']}
@@ -255,7 +255,7 @@ export default function SendScreen() {
               >
                 <TextInput
                   style={styles.addressInput}
-                  placeholder="Pega la dirección de Solana aquí..."
+                  placeholder="Pega la dirección aquí o escanea el QR..."
                   placeholderTextColor="#666666"
                   value={recipientAddress}
                   onChangeText={setRecipientAddress}
@@ -277,13 +277,13 @@ export default function SendScreen() {
           {/* Urban Amount Input */}
           <Animated.View style={[styles.section, { opacity: fadeAnim, transform: [{ translateY: slideAnim }] }]}>
             <View style={styles.amountHeader}>
-              <Text style={styles.sectionTitle}>💸 Cantidad</Text>
+              <Text style={styles.sectionTitle}>¿Cuánto mandas? 💸</Text>
               <TouchableOpacity style={styles.maxButton} onPress={handleMaxAmount}>
                 <LinearGradient
                   colors={['#00FF88', '#4CAF50']}
                   style={styles.maxGradient}
                 >
-                  <Text style={styles.maxButtonText}>MAX</Text>
+                  <Text style={styles.maxButtonText}>TODO</Text>
                 </LinearGradient>
               </TouchableOpacity>
             </View>
@@ -310,14 +310,14 @@ export default function SendScreen() {
             </View>
             
             <Text style={styles.balanceText}>
-              💳 Disponible: {balances[selectedToken as keyof typeof balances].toFixed(4)} {selectedToken}
+              💳 Tienes: {balances[selectedToken as keyof typeof balances].toFixed(4)} {selectedToken}
             </Text>
           </Animated.View>
 
           {/* Street-Style Transaction Preview */}
           {recipientAddress && amount && (
             <Animated.View style={[styles.previewSection, { opacity: fadeAnim }]}>
-              <Text style={styles.sectionTitle}>👀 Previsualización</Text>
+              <Text style={styles.sectionTitle}>Revisa antes de mandar 👀</Text>
               <LinearGradient
                 colors={['rgba(30, 144, 255, 0.1)', 'rgba(255, 0, 110, 0.1)']}
                 start={{ x: 0, y: 0 }}
@@ -325,13 +325,13 @@ export default function SendScreen() {
                 style={styles.previewGradient}
               >
                 <View style={styles.previewRow}>
-                  <Text style={styles.previewLabel}>📤 De:</Text>
+                  <Text style={styles.previewLabel}>🏠 De tu billetera:</Text>
                   <Text style={styles.previewValue}>
                     {walletData?.publicKey.slice(0, 8)}...{walletData?.publicKey.slice(-8)}
                   </Text>
                 </View>
                 <View style={styles.previewRow}>
-                  <Text style={styles.previewLabel}>📥 Para:</Text>
+                  <Text style={styles.previewLabel}>📱 Para:</Text>
                   <Text style={styles.previewValue}>
                     {recipientAddress.slice(0, 8)}...{recipientAddress.slice(-8)}
                   </Text>
@@ -342,7 +342,7 @@ export default function SendScreen() {
                 </View>
                 {selectedToken === 'USDC' && (
                   <View style={styles.rewardRow}>
-                    <Text style={styles.rewardLabel}>🎁 Recompensa SLT:</Text>
+                    <Text style={styles.rewardLabel}>🎁 Premio que te ganas:</Text>
                     <Text style={styles.rewardValue}>+{(parseFloat(amount || '0') * 0.1).toFixed(2)} SLT</Text>
                   </View>
                 )}
@@ -374,7 +374,7 @@ export default function SendScreen() {
               ) : (
                 <>
                   <Ionicons name="send" size={24} color="#FFFFFF" />
-                  <Text style={styles.sendButtonText}>Enviar {selectedToken} 🚀</Text>
+                  <Text style={styles.sendButtonText}>¡Mandar {selectedToken} al toque! 🚀</Text>
                 </>
               )}
             </LinearGradient>

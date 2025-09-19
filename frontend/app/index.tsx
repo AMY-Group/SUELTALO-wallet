@@ -85,7 +85,7 @@ export default function WelcomeScreen() {
         >
           <View style={styles.loadingContent}>
             <Text style={styles.loadingText}>SUÉLTALO</Text>
-            <Text style={styles.loadingSubtext}>Cargando...</Text>
+            <Text style={styles.loadingSubtext}>Cargando tu lana... 💰</Text>
           </View>
         </LinearGradient>
       </SafeAreaView>
@@ -105,7 +105,7 @@ export default function WelcomeScreen() {
       >
         <Animated.View style={[styles.headerContent, { opacity: fadeAnim }]}>
           <Text style={styles.appName}>SUÉLTALO</Text>
-          <Text style={styles.tagline}>Billetera Cripto No-Custodial</Text>
+          <Text style={styles.tagline}>Tu lana, sin fronteras 🌎</Text>
           <View style={styles.badge}>
             <Text style={styles.badgeText}>SOLANA DEVNET</Text>
           </View>
@@ -123,12 +123,12 @@ export default function WelcomeScreen() {
         </View>
 
         <Text style={styles.title}>
-          {hasWallet ? '¡Bienvenido de Vuelta!' : 'Comenzar'}
+          {hasWallet ? '¡Órale, qué bueno verte! 👋' : 'Dale, empecemos 🚀'}
         </Text>
         <Text style={styles.subtitle}>
           {hasWallet 
-            ? 'Accede a tu billetera Solana no-custodial'
-            : 'Crea o importa tu billetera Solana no-custodial'
+            ? 'Tu billetera te está esperando, échale un ojo a tu feria'
+            : 'Crea tu billetera y manda feria a tu familia al toque'
           }
         </Text>
 
@@ -145,7 +145,7 @@ export default function WelcomeScreen() {
                 style={styles.gradientButton}
               >
                 <Ionicons name="arrow-forward" size={24} color="#FFFFFF" style={styles.buttonIcon} />
-                <Text style={styles.primaryButtonText}>Acceder Billetera</Text>
+                <Text style={styles.primaryButtonText}>Ver mi lana</Text>
               </LinearGradient>
             </TouchableOpacity>
           ) : (
@@ -161,7 +161,7 @@ export default function WelcomeScreen() {
                   style={styles.gradientButton}
                 >
                   <Ionicons name="add-circle" size={24} color="#FFFFFF" style={styles.buttonIcon} />
-                  <Text style={styles.primaryButtonText}>Nueva Billetera</Text>
+                  <Text style={styles.primaryButtonText}>Crear mi billetera</Text>
                 </LinearGradient>
               </TouchableOpacity>
 
@@ -174,7 +174,7 @@ export default function WelcomeScreen() {
                   style={styles.secondaryGradient}
                 >
                   <Ionicons name="download" size={24} color="#1E90FF" style={styles.buttonIcon} />
-                  <Text style={styles.secondaryButtonText}>Importar Billetera</Text>
+                  <Text style={styles.secondaryButtonText}>Ya tengo una</Text>
                 </LinearGradient>
               </TouchableOpacity>
             </>
@@ -187,22 +187,38 @@ export default function WelcomeScreen() {
             <View style={styles.featureIcon}>
               <Ionicons name="shield-checkmark" size={28} color="#00FF88" />
             </View>
-            <Text style={styles.featureText}>No-Custodial</Text>
-            <Text style={styles.featureSubtext}>Tu Control</Text>
+            <Text style={styles.featureText}>Tu Control</Text>
+            <Text style={styles.featureSubtext}>Sin intermediarios</Text>
           </View>
           <View style={styles.feature}>
             <View style={styles.featureIcon}>
               <Ionicons name="flash" size={28} color="#1E90FF" />
             </View>
-            <Text style={styles.featureText}>Rápido</Text>
-            <Text style={styles.featureSubtext}>Transferencias</Text>
+            <Text style={styles.featureText}>Al Toque</Text>
+            <Text style={styles.featureSubtext}>Súper rápido</Text>
           </View>
           <View style={styles.feature}>
             <View style={styles.featureIcon}>
               <Ionicons name="gift" size={28} color="#FF006E" />
             </View>
-            <Text style={styles.featureText}>Recompensas</Text>
-            <Text style={styles.featureSubtext}>SLT Tokens</Text>
+            <Text style={styles.featureText}>Premios</Text>
+            <Text style={styles.featureSubtext}>Por cada envío</Text>
+          </View>
+        </View>
+
+        {/* User Segment Messages */}
+        <View style={styles.segmentMessages}>
+          <View style={styles.segmentCard}>
+            <Text style={styles.segmentEmoji}>🏠</Text>
+            <Text style={styles.segmentText}>Manda feria a tu familia al toque 🚀</Text>
+          </View>
+          <View style={styles.segmentCard}>
+            <Text style={styles.segmentEmoji}>💼</Text>
+            <Text style={styles.segmentText}>Cobra en dólares digitales, sin broncas 💵</Text>
+          </View>
+          <View style={styles.segmentCard}>
+            <Text style={styles.segmentEmoji}>💻</Text>
+            <Text style={styles.segmentText}>Recibe tu paga global sin esperar 💻</Text>
           </View>
         </View>
       </Animated.View>
@@ -240,7 +256,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     color: '#AAAAAA',
     marginTop: 12,
-    letterSpacing: 2,
+    letterSpacing: 1,
   },
   gradientHeader: {
     paddingTop: 60,
@@ -260,11 +276,11 @@ const styles = StyleSheet.create({
     textShadowRadius: 4,
   },
   tagline: {
-    fontSize: 16,
+    fontSize: 18,
     color: '#AAAAAA',
     marginTop: 8,
-    letterSpacing: 2,
-    textTransform: 'uppercase',
+    letterSpacing: 1,
+    textAlign: 'center',
   },
   badge: {
     backgroundColor: 'rgba(0, 0, 0, 0.3)',
@@ -285,11 +301,11 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: 24,
     alignItems: 'center',
-    paddingTop: 40,
+    paddingTop: 30,
   },
   iconContainer: {
     alignItems: 'center',
-    marginBottom: 40,
+    marginBottom: 30,
   },
   neonIconCircle: {
     width: 160,
@@ -315,24 +331,25 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   title: {
-    fontSize: 32,
+    fontSize: 28,
     fontWeight: '800',
     color: '#FFFFFF',
     textAlign: 'center',
     marginBottom: 12,
-    letterSpacing: 1,
+    letterSpacing: 0.5,
   },
   subtitle: {
-    fontSize: 18,
+    fontSize: 16,
     color: '#AAAAAA',
     textAlign: 'center',
-    marginBottom: 50,
-    lineHeight: 26,
-    paddingHorizontal: 20,
+    marginBottom: 30,
+    lineHeight: 24,
+    paddingHorizontal: 10,
   },
   buttonContainer: {
     width: '100%',
-    gap: 20,
+    gap: 16,
+    marginBottom: 30,
   },
   primaryButton: {
     borderRadius: 16,
@@ -353,7 +370,7 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontSize: 18,
     fontWeight: '700',
-    letterSpacing: 1,
+    letterSpacing: 0.5,
   },
   secondaryButton: {
     borderRadius: 16,
@@ -372,7 +389,7 @@ const styles = StyleSheet.create({
     color: '#1E90FF',
     fontSize: 18,
     fontWeight: '700',
-    letterSpacing: 1,
+    letterSpacing: 0.5,
   },
   buttonIcon: {
     marginRight: 12,
@@ -381,7 +398,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-around',
     width: '100%',
-    marginTop: 60,
+    marginBottom: 30,
     paddingHorizontal: 10,
   },
   feature: {
@@ -411,5 +428,29 @@ const styles = StyleSheet.create({
     fontSize: 12,
     textAlign: 'center',
     marginTop: 4,
+  },
+  segmentMessages: {
+    width: '100%',
+    gap: 16,
+  },
+  segmentCard: {
+    backgroundColor: 'rgba(30, 144, 255, 0.05)',
+    borderWidth: 1,
+    borderColor: 'rgba(30, 144, 255, 0.2)',
+    borderRadius: 16,
+    padding: 16,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  segmentEmoji: {
+    fontSize: 24,
+    marginRight: 16,
+  },
+  segmentText: {
+    color: '#FFFFFF',
+    fontSize: 14,
+    fontWeight: '600',
+    flex: 1,
+    lineHeight: 20,
   },
 });

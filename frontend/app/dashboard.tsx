@@ -79,7 +79,7 @@ export default function DashboardScreen() {
       await loadTransactions(wallet.publicKey);
     } catch (error) {
       console.error('Error loading wallet data:', error);
-      Alert.alert('Error', 'Failed to load wallet data');
+      Alert.alert('Oops', 'No pudimos cargar tu información, inténtalo de nuevo');
     } finally {
       setLoading(false);
     }
@@ -170,7 +170,7 @@ export default function DashboardScreen() {
           end={{ x: 1, y: 1 }}
           style={styles.gradientOverlay}
         >
-          <Text style={styles.loadingText}>Cargando billetera...</Text>
+          <Text style={styles.loadingText}>Cargando tu billetera... 💰</Text>
         </LinearGradient>
       </SafeAreaView>
     );
@@ -208,7 +208,7 @@ export default function DashboardScreen() {
       >
         {/* Neon Balance Cards */}
         <Animated.View style={[styles.balanceSection, { opacity: fadeAnim, transform: [{ scale: bounceAnim }] }]}>
-          <Text style={styles.sectionTitle}>Mi Portfolio</Text>
+          <Text style={styles.sectionTitle}>Tu Feria 💰</Text>
           
           <View style={styles.balanceGrid}>
             {/* USDC Card - Primary */}
@@ -226,7 +226,7 @@ export default function DashboardScreen() {
                   <Text style={styles.tokenLabel}>USDC</Text>
                 </View>
                 <Text style={styles.balanceAmount}>${formatAmount(balances.USDC, 2)}</Text>
-                <Text style={styles.balanceSubtext}>Dólares Digitales</Text>
+                <Text style={styles.balanceSubtext}>Dólares digitales</Text>
               </LinearGradient>
             </View>
 
@@ -245,7 +245,7 @@ export default function DashboardScreen() {
                   <Text style={styles.tokenLabel}>SOL</Text>
                 </View>
                 <Text style={styles.balanceAmount}>{formatAmount(balances.SOL)}</Text>
-                <Text style={styles.balanceSubtext}>Solana</Text>
+                <Text style={styles.balanceSubtext}>Para fees</Text>
               </LinearGradient>
             </View>
 
@@ -264,7 +264,7 @@ export default function DashboardScreen() {
                   <Text style={styles.tokenLabel}>SLT</Text>
                 </View>
                 <Text style={styles.balanceAmount}>{formatAmount(balances.SLT)}</Text>
-                <Text style={styles.balanceSubtext}>Recompensas</Text>
+                <Text style={styles.balanceSubtext}>Premios ganados</Text>
               </LinearGradient>
             </View>
           </View>
@@ -279,7 +279,7 @@ export default function DashboardScreen() {
             >
               <Ionicons name="arrow-up" size={28} color="#FFFFFF" />
             </LinearGradient>
-            <Text style={styles.actionButtonText}>Enviar</Text>
+            <Text style={styles.actionButtonText}>Mandar</Text>
           </TouchableOpacity>
 
           <TouchableOpacity style={styles.actionButton} onPress={handleReceive}>
@@ -289,7 +289,7 @@ export default function DashboardScreen() {
             >
               <Ionicons name="arrow-down" size={28} color="#FFFFFF" />
             </LinearGradient>
-            <Text style={styles.actionButtonText}>Recibir</Text>
+            <Text style={styles.actionButtonText}>Cobrar</Text>
           </TouchableOpacity>
 
           <TouchableOpacity style={styles.actionButton} onPress={handleRewards}>
@@ -299,7 +299,7 @@ export default function DashboardScreen() {
             >
               <Ionicons name="gift" size={28} color="#FFFFFF" />
             </LinearGradient>
-            <Text style={styles.actionButtonText}>Rewards</Text>
+            <Text style={styles.actionButtonText}>Premios</Text>
           </TouchableOpacity>
 
           <TouchableOpacity style={styles.actionButton} onPress={handleKYC}>
@@ -309,16 +309,16 @@ export default function DashboardScreen() {
             >
               <Ionicons name="shield-checkmark" size={28} color="#FFFFFF" />
             </LinearGradient>
-            <Text style={styles.actionButtonText}>KYC</Text>
+            <Text style={styles.actionButtonText}>Verificar</Text>
           </TouchableOpacity>
         </Animated.View>
 
         {/* Neon Ledger Transactions */}
         <Animated.View style={[styles.transactionSection, { opacity: fadeAnim }]}>
           <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>Transacciones Recientes</Text>
+            <Text style={styles.sectionTitle}>Movimientos Recientes</Text>
             <TouchableOpacity onPress={handleTransactionHistory}>
-              <Text style={styles.viewAllText}>Ver Todo</Text>
+              <Text style={styles.viewAllText}>Ver todo</Text>
             </TouchableOpacity>
           </View>
 
@@ -327,8 +327,8 @@ export default function DashboardScreen() {
               <View style={styles.emptyIconContainer}>
                 <Ionicons name="receipt-outline" size={64} color="#AAAAAA" />
               </View>
-              <Text style={styles.emptyStateText}>Sin transacciones aún</Text>
-              <Text style={styles.emptyStateSubtext}>Tu historial aparecerá aquí</Text>
+              <Text style={styles.emptyStateText}>¡Órale! No hay movimientos aún</Text>
+              <Text style={styles.emptyStateSubtext}>Cuando mandes o recibas lana, aquí aparecerá</Text>
             </View>
           ) : (
             <View style={styles.transactionList}>
@@ -364,7 +364,7 @@ export default function DashboardScreen() {
                       </View>
                       <View style={styles.transactionDetails}>
                         <Text style={styles.transactionType}>
-                          {tx.from_address === walletData?.publicKey ? 'Enviado' : 'Recibido'} {tx.token_type}
+                          {tx.from_address === walletData?.publicKey ? 'Mandaste' : 'Te llegó'} {tx.token_type}
                         </Text>
                         <Text style={styles.transactionAddress}>
                           {tx.from_address === walletData?.publicKey 
@@ -381,7 +381,7 @@ export default function DashboardScreen() {
                         {formatAmount(tx.amount)} {tx.token_type}
                       </Text>
                       {tx.reward_slt > 0 && (
-                        <Text style={styles.rewardText}>+{formatAmount(tx.reward_slt)} SLT</Text>
+                        <Text style={styles.rewardText}>+{formatAmount(tx.reward_slt)} SLT 🎁</Text>
                       )}
                     </View>
                   </LinearGradient>
@@ -585,6 +585,9 @@ const styles = StyleSheet.create({
   emptyStateSubtext: {
     color: '#666666',
     fontSize: 14,
+    textAlign: 'center',
+    paddingHorizontal: 20,
+    lineHeight: 20,
   },
   transactionList: {
     gap: 12,
