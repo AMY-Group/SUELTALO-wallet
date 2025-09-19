@@ -326,11 +326,9 @@ export default function DashboardScreen() {
               {transactions.slice(0, 3).map((tx, index) => (
                 <View key={tx.id} style={styles.activityItem}>
                   <View style={styles.activityIcon}>
-                    <Ionicons 
-                      name={tx.from_address === walletData?.publicKey ? 'arrow-up-circle' : 'arrow-down-circle'} 
-                      size={20} 
-                      color={tx.from_address === walletData?.publicKey ? '#FF006E' : '#00FF88'} 
-                    />
+                    <Text style={styles.activityEmoji}>
+                      {tx.from_address === walletData?.publicKey ? '↗️' : '↙️'}
+                    </Text>
                   </View>
                   <View style={styles.activityDetails}>
                     <Text style={styles.activityType}>
