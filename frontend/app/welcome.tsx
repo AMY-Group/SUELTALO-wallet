@@ -6,14 +6,11 @@ import {
   SafeAreaView,
   TouchableOpacity,
   StatusBar,
-  Image,
   Dimensions,
-  PanGestureHandler,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import * as SecureStore from 'expo-secure-store';
-import { GestureHandlerRootView, PanGestureHandler as RNGHPanGestureHandler } from 'react-native-gesture-handler';
 
 const { width, height } = Dimensions.get('window');
 
