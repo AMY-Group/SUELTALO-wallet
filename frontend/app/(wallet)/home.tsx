@@ -24,13 +24,13 @@ import { ErrorBoundary } from '../../components/ErrorBoundary';
 
 const { width } = Dimensions.get('window');
 
-interface Balance {
+type Balance = {
   SOL: number;
   USDC: number;
   SLT: number | null;
-}
+};
 
-interface Transaction {
+type Transaction = {
   id: string;
   from_address: string;
   to_address: string;
@@ -39,7 +39,7 @@ interface Transaction {
   status: string;
   timestamp: string;
   reward_slt: number;
-}
+};
 
 export default function DashboardScreen() {
   const router = useRouter();
