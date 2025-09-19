@@ -461,10 +461,13 @@ const styles = StyleSheet.create({
   },
   scrollContainer: {
     flex: 1,
-    paddingBottom: 90, // Space for bottom nav
+  },
+  scrollContent: {
+    padding: 16,
+    paddingBottom: 110, // Space for bottom nav
   },
   balancesSection: {
-    padding: 20,
+    marginBottom: 20,
   },
   sectionTitle: {
     fontSize: 28,
