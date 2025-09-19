@@ -233,7 +233,7 @@ export class WalletService {
 
   static async getSeedPhrase(): Promise<string | null> {
     try {
-      return await SecureStore.getItemAsync(this.SEED_PHRASE_KEY);
+      return await this.getSecureItem(this.SEED_PHRASE_KEY);
     } catch (error) {
       console.error('Failed to get seed phrase:', error);
       return null;
