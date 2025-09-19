@@ -269,7 +269,7 @@ export default function DashboardScreen() {
               </View>
               
               <TouchableOpacity style={styles.profileButton}>
-                <Text style={styles.addressText}>{formatAddress(walletData?.publicKey)}</Text>
+                <Text style={styles.addressText}>{formatAddress(publicKey)}</Text>
               </TouchableOpacity>
             </View>
           </LinearGradient>
