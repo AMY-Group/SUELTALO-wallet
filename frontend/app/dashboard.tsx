@@ -50,6 +50,7 @@ export default function DashboardScreen() {
   const glowAnim = new Animated.Value(0);
 
   useEffect(() => {
+    console.info('DASHBOARD_RENDER_OK');
     loadWalletData();
     startAnimations();
   }, []);
