@@ -243,10 +243,31 @@ const styles = StyleSheet.create({
     paddingVertical: 20,
     alignItems: 'center',
   },
-  decorationText: {
-    fontSize: 16,
+  swipeHint: {
+    fontSize: 14,
     color: '#AAAAAA',
     fontWeight: '600',
     letterSpacing: 0.5,
+    textAlign: 'center',
+    marginBottom: 16,
+  },
+  dotsContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  dot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: 'rgba(255, 255, 255, 0.3)',
+  },
+  activeDot: {
+    backgroundColor: '#FF006E',
+    shadowColor: '#FF006E',
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.8,
+    shadowRadius: 8,
+    elevation: 8,
   },
 });
