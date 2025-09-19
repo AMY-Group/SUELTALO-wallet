@@ -21,14 +21,19 @@ export default function WelcomeScreen() {
     try {
       // Mark welcome as seen
       await SecureStore.setItemAsync('welcomeSeen', 'true');
-      console.log('Welcome screen accepted, proceeding to onboarding');
+      console.log('Welcome screen accepted, proceeding to tour');
       
-      // Redirect to onboarding
-      router.push('/(onboarding)/create');
+      // Navigate to tour screens
+      router.push('/tour');
     } catch (error) {
       console.error('Error saving welcome state:', error);
-      router.push('/(onboarding)/create');
+      router.push('/tour');
     }
+  };
+
+  const handleSwipe = () => {
+    // Handle swipe gesture to continue to tour
+    handleAccept();
   };
 
   return (
