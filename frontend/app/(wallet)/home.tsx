@@ -301,7 +301,7 @@ export default function DashboardScreen() {
               </View>
               
               <View style={styles.headerRight}>
-                <Text style={styles.addressText}>{formatAddress(publicKey)}</Text>
+                <Text style={styles.addressText}>{formatAddress(publicKey || '')}</Text>
                 {lastUpdated && (
                   <Text style={styles.updatedText}>{getTimeAgo(lastUpdated)}</Text>
                 )}
