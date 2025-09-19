@@ -100,9 +100,14 @@ export default function WelcomeScreen() {
         </TouchableOpacity>
       </View>
 
-      {/* Bottom Decoration */}
+      {/* Bottom Navigation Hint */}
       <View style={styles.bottomDecoration}>
-        <Text style={styles.decorationText}>🚀 ¡Dale que arrancamos! 🚀</Text>
+        <Text style={styles.swipeHint}>👆 Toca "Aceptar" o desliza para continuar</Text>
+        <View style={styles.dotsContainer}>
+          <View style={[styles.dot, styles.activeDot]} />
+          <View style={styles.dot} />
+          <View style={styles.dot} />
+        </View>
       </View>
     </SafeAreaView>
   );
