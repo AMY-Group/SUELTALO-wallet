@@ -480,9 +480,7 @@ const styles = StyleSheet.create({
   neonCard: {
     borderRadius: 24,
     marginBottom: 20,
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.6,
-    shadowRadius: 20,
+    boxShadow: '0px 0px 20px rgba(30, 144, 255, 0.6)',
     elevation: 20,
   },
   usdcCard: {
