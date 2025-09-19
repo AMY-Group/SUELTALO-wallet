@@ -20,7 +20,7 @@ export default function WelcomeScreen() {
   const handleAccept = async () => {
     try {
       // Mark welcome as seen
-      await SecureStore.setItemAsync('welcomeSeen', 'true');
+      await AsyncStorage.setItem('welcomeSeen', 'true');
       console.log('Welcome screen accepted, proceeding to tour');
       
       // Navigate to tour screens
