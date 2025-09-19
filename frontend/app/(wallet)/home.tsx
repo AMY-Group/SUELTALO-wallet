@@ -87,32 +87,15 @@ export default function DashboardScreen() {
 
   const loadWalletData = async () => {
     try {
-      // TEMPORARY: Simulate wallet data for testing
-      const mockWallet = {
-        publicKey: 'H8j9k2L3m4N5o6P7q8R9s0T1u2V3w4X5y6Z7a8B9c0D1e2F3',
-        privateKey: 'mock-private-key'
-      };
+      const wallet = await WalletService.getStoredWalletData();
+      if (!wallet) {
+        router.replace('/');
+        return;
+      }
       
-      setWalletData(mockWallet);
-      
-      // Set mock balances for testing
-      setBalances({
-        USDC: 1500.25,
-        SLT: 850.50,
-        SOL: 2.5
-      });
-      
-      setLoading(false);
-      
-      // const wallet = await WalletService.getStoredWalletData();
-      // if (!wallet) {
-      //   router.replace('/');
-      //   return;
-      // }
-      // 
-      // setWalletData(wallet);
-      // await loadBalances(wallet.publicKey);
-      // await loadTransactions(wallet.publicKey);
+      setWalletData(wallet);
+      await loadBalances(wallet.publicKey);
+      await loadTransactions(wallet.publicKey);
     } catch (error) {
       console.error('Error loading wallet data:', error);
       Alert.alert('Oops', 'No pudimos cargar tu información, inténtalo de nuevo');
