@@ -365,7 +365,9 @@ export default function DashboardScreen() {
                     <Text style={styles.cardTitle}>SLT</Text>
                   </View>
                   <Text style={styles.cardAmount}>{formatAmount(balances.SLT)}</Text>
-                  <Text style={styles.cardSubtitle}>Premios ganados</Text>
+                  <Text style={styles.cardSubtitle}>
+                    {balances.SLT === null ? 'Configurar SLT devnet' : 'Premios ganados'}
+                  </Text>
                 </LinearGradient>
               </Animated.View>
 
