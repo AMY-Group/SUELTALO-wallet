@@ -623,8 +623,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   scrollContent: {
-    padding: 16,
-    paddingBottom: 110, // Space for bottom nav
+    paddingBottom: 40,
   },
   balancesSection: {
     marginBottom: 20,
