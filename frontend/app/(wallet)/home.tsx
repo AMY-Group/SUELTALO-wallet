@@ -31,7 +31,7 @@ export default function DashboardScreen() {
   const router = useRouter();
   const [publicKey, setPublicKey] = useState<string | null>(null);
   const [balances, setBalances] = useState(defaultBalance);
-  const [transactions, setTransactions] = useState([]);
+  const [transactions, setTransactions] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [activeTab, setActiveTab] = useState('inicio');
