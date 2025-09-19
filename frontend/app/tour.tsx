@@ -45,8 +45,8 @@ export default function TourScreen() {
     if (currentStep < tourSteps.length - 1) {
       setCurrentStep(currentStep + 1);
     } else {
-      // End of tour, navigate to onboarding
-      router.push('/(onboarding)/create');
+      // Navigate to segment-specific tour
+      router.push('/tour-migrantes');
     }
   };
 
