@@ -309,9 +309,12 @@ export default function DashboardScreen() {
                 <Text style={styles.tagline}>Tu lana, sin fronteras 🌎</Text>
               </View>
               
-              <TouchableOpacity style={styles.profileButton}>
+              <View style={styles.headerRight}>
                 <Text style={styles.addressText}>{formatAddress(publicKey)}</Text>
-              </TouchableOpacity>
+                {lastUpdated && (
+                  <Text style={styles.updatedText}>{getTimeAgo(lastUpdated)}</Text>
+                )}
+              </View>
             </View>
           </LinearGradient>
         </View>
