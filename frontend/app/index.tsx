@@ -17,11 +17,8 @@ export default function Index() {
       const secret = await SecureStore.getItemAsync('secret');
       console.log('Checking wallet existence:', secret ? 'Found' : 'Not found');
       
-      // TEMPORARY: Force wallet existence for testing
-      setHasWallet(true);
-      
-      // Normal logic (commented out for testing):
-      // setHasWallet(!!secret);
+      // Normal logic:
+      setHasWallet(!!secret);
     } catch (error) {
       console.error('Error checking wallet:', error);
       setHasWallet(false);
