@@ -25,7 +25,7 @@ import { ErrorBoundary } from '../../components/ErrorBoundary';
 const { width } = Dimensions.get('window');
 
 // Types
-const defaultBalance = { SOL: 0, USDC: 0, SLT: null };
+const defaultBalance = { SOL: 0, USDC: 0, SLT: null as number | null };
 
 export default function DashboardScreen() {
   const router = useRouter();
