@@ -49,7 +49,7 @@ export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoun
               </Text>
               
               <TouchableOpacity style={styles.retryButton} onPress={this.handleRetry}>
-                <Ionicons name="refresh" size={20} color="#FFFFFF" />
+                <Text style={styles.retryIcon}>🔄</Text>
                 <Text style={styles.retryText}>Reintentar</Text>
               </TouchableOpacity>
             </View>
