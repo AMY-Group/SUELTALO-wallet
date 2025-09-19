@@ -346,64 +346,53 @@ export default function DashboardScreen() {
             </View>
           </Animated.View>
         )}
-      </ScrollView>
+        </ScrollView>
 
-      {/* Bottom Navigation with Neon Icons */}
-      <View style={styles.bottomNav}>
-        <LinearGradient
-          colors={['rgba(12, 12, 12, 0.95)', 'rgba(30, 30, 30, 0.95)']}
-          style={styles.bottomNavGradient}
-        >
-          <TouchableOpacity 
-            style={[styles.navButton, activeTab === 'inicio' && styles.activeNavButton]} 
-            onPress={() => setActiveTab('inicio')}
+        {/* Bottom Navigation with Neon Icons */}
+        <View style={styles.bottomNav}>
+          <LinearGradient
+            colors={['rgba(12, 12, 12, 0.95)', 'rgba(30, 30, 30, 0.95)']}
+            style={styles.bottomNavGradient}
           >
-            <Ionicons 
-              name="home" 
-              size={24} 
-              color={activeTab === 'inicio' ? '#1E90FF' : '#666666'} 
-            />
-            <Text style={[styles.navText, activeTab === 'inicio' && styles.activeNavText]}>
-              Inicio
-            </Text>
-          </TouchableOpacity>
+            <TouchableOpacity 
+              style={[styles.navButton, activeTab === 'inicio' && styles.activeNavButton]} 
+              onPress={() => setActiveTab('inicio')}
+            >
+              <Text style={styles.navIcon}>🏠</Text>
+              <Text style={[styles.navText, activeTab === 'inicio' && styles.activeNavText]}>
+                Inicio
+              </Text>
+            </TouchableOpacity>
 
-          <TouchableOpacity 
-            style={[styles.navButton, activeTab === 'historial' && styles.activeNavButton]} 
-            onPress={() => {
-              setActiveTab('historial');
-              handleTransactions();
-            }}
-          >
-            <Ionicons 
-              name="list" 
-              size={24} 
-              color={activeTab === 'historial' ? '#FF006E' : '#666666'} 
-            />
-            <Text style={[styles.navText, activeTab === 'historial' && styles.activeNavText]}>
-              Historial
-            </Text>
-          </TouchableOpacity>
+            <TouchableOpacity 
+              style={[styles.navButton, activeTab === 'historial' && styles.activeNavButton]} 
+              onPress={() => {
+                setActiveTab('historial');
+                handleTransactions();
+              }}
+            >
+              <Text style={styles.navIcon}>📋</Text>
+              <Text style={[styles.navText, activeTab === 'historial' && styles.activeNavText]}>
+                Historial
+              </Text>
+            </TouchableOpacity>
 
-          <TouchableOpacity 
-            style={[styles.navButton, activeTab === 'config' && styles.activeNavButton]} 
-            onPress={() => {
-              setActiveTab('config');
-              handleSettings();
-            }}
-          >
-            <Ionicons 
-              name="settings" 
-              size={24} 
-              color={activeTab === 'config' ? '#00FF88' : '#666666'} 
-            />
-            <Text style={[styles.navText, activeTab === 'config' && styles.activeNavText]}>
-              Config
-            </Text>
-          </TouchableOpacity>
-        </LinearGradient>
-      </View>
-    </SafeAreaView>
+            <TouchableOpacity 
+              style={[styles.navButton, activeTab === 'config' && styles.activeNavButton]} 
+              onPress={() => {
+                setActiveTab('config');
+                handleSettings();
+              }}
+            >
+              <Text style={styles.navIcon}>⚙️</Text>
+              <Text style={[styles.navText, activeTab === 'config' && styles.activeNavText]}>
+                Config
+              </Text>
+            </TouchableOpacity>
+          </LinearGradient>
+        </View>
+      </SafeAreaView>
+    </ErrorBoundary>
   );
 }
 
