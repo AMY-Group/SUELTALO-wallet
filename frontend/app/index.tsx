@@ -116,7 +116,7 @@ export default function WelcomeScreen() {
         <View style={styles.iconContainer}>
           <View style={styles.neonIconCircle}>
             <View style={styles.innerGlow}>
-              <Ionicons name="wallet" size={80} color="#00FF88" />
+              <Text style={styles.walletIcon}>💰</Text>
             </View>
           </View>
         </View>
