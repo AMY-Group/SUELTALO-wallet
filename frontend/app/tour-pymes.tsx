@@ -18,7 +18,7 @@ export default function TourPyMesScreen() {
 
   const handleContinue = () => {
     // Navigate to next tour step (3/3)
-    router.push('/tour-empresarios');
+    router.push('/tour-freelancers');
   };
 
   const handleSkip = () => {
