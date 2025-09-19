@@ -582,7 +582,10 @@ const styles = StyleSheet.create({
   bigActionButton: {
     borderRadius: 20,
     overflow: 'hidden',
-    boxShadow: '0px 8px 16px rgba(30, 144, 255, 0.3)',
+    shadowColor: '#1E90FF',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.3,
+    shadowRadius: 16,
     elevation: 16,
   },
   bigButtonGradient: {
