@@ -20,7 +20,9 @@ export default function RootLayout() {
           }}
         >
           <Stack.Screen name="index" />
-          <Stack.Screen name="onboarding" />
+          <Stack.Screen name="onboarding/index" />
+          <Stack.Screen name="onboarding/create" />
+          <Stack.Screen name="onboarding/import" />
           <Stack.Screen name="dashboard" />
           <Stack.Screen name="send" />
           <Stack.Screen name="receive" />
