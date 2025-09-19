@@ -804,4 +804,73 @@ const styles = StyleSheet.create({
   activityEmoji: {
     fontSize: 18,
   },
+  // CTA Styles
+  ctaContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 40,
+  },
+  ctaEmoji: {
+    fontSize: 64,
+    marginBottom: 20,
+  },
+  ctaTitle: {
+    fontSize: 28,
+    fontWeight: '800',
+    color: '#FFFFFF',
+    textAlign: 'center',
+    marginBottom: 12,
+    letterSpacing: 0.5,
+  },
+  ctaSubtitle: {
+    fontSize: 16,
+    color: '#AAAAAA',
+    textAlign: 'center',
+    marginBottom: 40,
+    lineHeight: 24,
+  },
+  ctaButton: {
+    width: '100%',
+    borderRadius: 16,
+    overflow: 'hidden',
+    marginBottom: 16,
+  },
+  gradientButton: {
+    paddingVertical: 20,
+    paddingHorizontal: 32,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  ctaButtonText: {
+    color: '#FFFFFF',
+    fontSize: 18,
+    fontWeight: '700',
+    letterSpacing: 0.5,
+  },
+  ctaSecondaryButton: {
+    width: '100%',
+    borderRadius: 16,
+    borderWidth: 2,
+    borderColor: '#1E90FF',
+    paddingVertical: 20,
+    paddingHorizontal: 32,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  ctaSecondaryText: {
+    color: '#1E90FF',
+    fontSize: 18,
+    fontWeight: '700',
+    letterSpacing: 0.5,
+  },
+  // Header styles
+  headerRight: {
+    alignItems: 'flex-end',
+  },
+  updatedText: {
+    fontSize: 12,
+    color: '#AAAAAA',
+    marginTop: 4,
+  },
 });
