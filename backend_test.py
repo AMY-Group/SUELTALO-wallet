@@ -11,7 +11,7 @@ from datetime import datetime
 import sys
 
 # API Configuration
-BASE_URL = "https://neon-cartera.preview.emergentagent.com/api"
+BASE_URL = "https://latam-wallet.preview.emergentagent.com/api"
 HEADERS = {"Content-Type": "application/json"}
 
 # Test Data

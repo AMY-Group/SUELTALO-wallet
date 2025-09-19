@@ -256,4 +256,4 @@ test_plan:
 
 agent_communication:
     - agent: "testing"
-      message: "Comprehensive backend API testing completed successfully. All 8 backend tasks tested and verified working. API endpoints responding correctly at https://neon-cartera.preview.emergentagent.com/api. MongoDB integration confirmed working. SLT reward calculations accurate. KYC mock progression system functioning as designed. No critical issues found."
+      message: "Comprehensive backend API testing completed successfully. All 8 backend tasks tested and verified working. API endpoints responding correctly at https://latam-wallet.preview.emergentagent.com/api. MongoDB integration confirmed working. SLT reward calculations accurate. KYC mock progression system functioning as designed. No critical issues found."
