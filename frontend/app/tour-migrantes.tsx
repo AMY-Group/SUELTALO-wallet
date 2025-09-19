@@ -17,8 +17,8 @@ export default function TourMigrantesScreen() {
   const router = useRouter();
 
   const handleContinue = () => {
-    // Navigate to next tour step or onboarding
-    router.push('/tour-freelancers'); // Next step in tour
+    // Navigate to next tour step (2/3)
+    router.push('/tour-pymes');
   };
 
   const handleSkip = () => {
