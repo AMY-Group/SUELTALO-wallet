@@ -27,7 +27,7 @@ export default function WelcomeScreen() {
       router.push('/(onboarding)/tour-migrantes');
     } catch (error) {
       console.error('Error saving welcome state:', error);
-      router.push('/tour');
+      router.push('/(onboarding)/tour-migrantes');
     }
   };
 
