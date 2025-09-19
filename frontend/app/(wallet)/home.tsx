@@ -216,8 +216,22 @@ export default function DashboardScreen() {
     return `${address.slice(0, 4)}...${address.slice(-4)}`;
   };
 
-  const formatAmount = (amount: number, decimals: number = 4) => {
-    return amount.toFixed(decimals);
+  const formatAmount = (amount: number | null) => {
+    if (amount === null) return '—';
+    return amount.toLocaleString('es-MX', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 6,
+    });
+  };
+
+  const getTimeAgo = (date: Date | null) => {
+    if (!date) return '';
+    const now = new Date();
+    const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
+    
+    if (diffInSeconds < 60) return `Actualizado hace ${diffInSeconds}s`;
+    if (diffInSeconds < 3600) return `Actualizado hace ${Math.floor(diffInSeconds / 60)}m`;
+    return `Actualizado hace ${Math.floor(diffInSeconds / 3600)}h`;
   };
 
   if (loading) {
