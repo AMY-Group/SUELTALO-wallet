@@ -301,7 +301,7 @@ export default function DashboardScreen() {
                     </View>
                     <Text style={styles.cardTitle}>USDC</Text>
                   </View>
-                  <Text style={styles.cardAmount}>${formatAmount(balances.USDC, 2)}</Text>
+                  <Text style={styles.cardAmount}>${formatAmount(balances.USDC)}</Text>
                   <Text style={styles.cardSubtitle}>Tu lana digital</Text>
                 </LinearGradient>
               </Animated.View>
