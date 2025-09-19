@@ -175,35 +175,39 @@ export default function DashboardScreen() {
   }
 
   return (
-    <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor="#0C0C0C" />
-      
-      {/* Gradient Header */}
-      <LinearGradient
-        colors={['#1E90FF', '#FF006E']}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
-        style={styles.gradientHeader}
-      >
-        <View style={styles.header}>
-          <View style={styles.headerLeft}>
-            <Text style={styles.appName}>SUÉLTALO</Text>
-            <Text style={styles.tagline}>Tu lana, sin fronteras 🌎</Text>
-          </View>
-          
-          <TouchableOpacity style={styles.profileButton}>
-            <Text style={styles.addressText}>{formatAddress(walletData?.publicKey)}</Text>
-          </TouchableOpacity>
+    <ErrorBoundary>
+      <SafeAreaView style={styles.container}>
+        <StatusBar barStyle="light-content" backgroundColor="#0C0C0C" />
+        
+        {/* Fixed Height Gradient Header */}
+        <View style={styles.headerContainer}>
+          <LinearGradient
+            colors={['#1E90FF', '#FF006E']}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={styles.gradientHeader}
+          >
+            <View style={styles.header}>
+              <View style={styles.headerLeft}>
+                <Text style={styles.appName}>SUÉLTALO</Text>
+                <Text style={styles.tagline}>Tu lana, sin fronteras 🌎</Text>
+              </View>
+              
+              <TouchableOpacity style={styles.profileButton}>
+                <Text style={styles.addressText}>{formatAddress(walletData?.publicKey)}</Text>
+              </TouchableOpacity>
+            </View>
+          </LinearGradient>
         </View>
-      </LinearGradient>
 
-      <ScrollView 
-        style={styles.scrollContainer}
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-        }
-        showsVerticalScrollIndicator={false}
-      >
+        <ScrollView 
+          style={styles.scrollContainer}
+          contentContainerStyle={styles.scrollContent}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }
+          showsVerticalScrollIndicator={false}
+        >
         {/* Neon Glowing Balance Cards */}
         <Animated.View style={[styles.balancesSection, { opacity: fadeAnim, transform: [{ scale: bounceAnim }] }]}>
           <Text style={styles.sectionTitle}>Tu Lana 💰</Text>
