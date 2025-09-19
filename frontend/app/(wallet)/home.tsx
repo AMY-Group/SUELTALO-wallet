@@ -402,7 +402,7 @@ export default function DashboardScreen() {
                     <View key={tx.id} style={styles.activityItem}>
                       <View style={styles.activityIcon}>
                         <Text style={styles.activityEmoji}>
-                          {tx.from_address === walletData?.publicKey ? '↗️' : '↙️'}
+                          {tx.from_address === publicKey ? '↗️' : '↙️'}
                         </Text>
                       </View>
                       <View style={styles.activityDetails}>
