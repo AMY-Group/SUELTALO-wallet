@@ -124,14 +124,20 @@ export default function OnboardingCTAScreen() {
         {/* Action Buttons */}
         <View style={styles.buttonsContainer}>
           {/* Primary Button */}
-          <TouchableOpacity style={styles.primaryButton} onPress={handleCreateWallet}>
+          <TouchableOpacity 
+            style={[styles.primaryButton, isCreating && styles.primaryButtonDisabled]} 
+            onPress={handleCreateWallet}
+            disabled={isCreating}
+          >
             <LinearGradient
-              colors={['#1E90FF', '#00BFFF']}
+              colors={isCreating ? ['#666666', '#888888'] : ['#1E90FF', '#00BFFF']}
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 1 }}
               style={styles.primaryButtonGradient}
             >
-              <Text style={styles.primaryButtonText}>Crear mi wallet 🚀</Text>
+              <Text style={styles.primaryButtonText}>
+                {isCreating ? 'Creando tu wallet... 💎' : 'Crear mi wallet 🚀'}
+              </Text>
             </LinearGradient>
           </TouchableOpacity>
 
