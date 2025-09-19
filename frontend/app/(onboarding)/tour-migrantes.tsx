@@ -18,11 +18,11 @@ export default function TourMigrantesScreen() {
 
   const handleContinue = () => {
     // Navigate to next tour step (2/3)
-    router.push('/tour-pymes');
+    router.push('/(onboarding)/tour-pymes');
   };
 
   const handleSkip = () => {
-    router.push('/(onboarding)/create');
+    router.push('/(onboarding)/final');
   };
 
   return (
