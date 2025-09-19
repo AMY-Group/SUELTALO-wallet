@@ -18,8 +18,18 @@ const { width, height } = Dimensions.get('window');
 export default function WelcomeScreen() {
   const router = useRouter();
 
-  const handleAccept = () => {
-    router.push('/');
+  const handleAccept = async () => {
+    try {
+      // Mark welcome as seen
+      await SecureStore.setItemAsync('welcomeSeen', 'true');
+      console.log('Welcome screen accepted, proceeding to onboarding');
+      
+      // Redirect to onboarding
+      router.push('/(onboarding)/create');
+    } catch (error) {
+      console.error('Error saving welcome state:', error);
+      router.push('/(onboarding)/create');
+    }
   };
 
   return (
