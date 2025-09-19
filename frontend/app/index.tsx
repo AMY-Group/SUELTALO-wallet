@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Text, Platform } from 'react-native';
 import { Redirect } from 'expo-router';
-import * as SecureStore from 'expo-secure-store';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function Index() {
@@ -11,17 +10,11 @@ export default function Index() {
   useEffect(() => {
     const checkWallet = async () => {
       try {
-        let secret;
-        if (Platform.OS === 'web') {
-          // Use AsyncStorage for web
-          secret = await AsyncStorage.getItem("secret");
-        } else {
-          // Use SecureStore for native
-          secret = await SecureStore.getItemAsync("secret");
-        }
+        // Check for wallet data using the same key as WalletService
+        const walletData = await AsyncStorage.getItem('@wallet_data');
         
-        console.log('Wallet check result:', secret ? 'Found' : 'Not found');
-        setHasWallet(!!secret);
+        console.log('Wallet check result:', walletData ? 'Found' : 'Not found');
+        setHasWallet(!!walletData);
       } catch (error) {
         console.error('Error checking wallet:', error);
         setHasWallet(false);
