@@ -43,12 +43,14 @@ interface Transaction {
 
 export default function DashboardScreen() {
   const router = useRouter();
-  const [walletData, setWalletData] = useState<any>(null);
-  const [balances, setBalances] = useState<Balance>({ SOL: 0, USDC: 0, SLT: 0 });
+  const [publicKey, setPublicKey] = useState<string | null>(null);
+  const [balances, setBalances] = useState<Balance>({ SOL: 0, USDC: 0, SLT: null });
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [activeTab, setActiveTab] = useState('inicio');
+  const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
+  const [showWalletCTA, setShowWalletCTA] = useState(false);
   const fadeAnim = new Animated.Value(0);
   const bounceAnim = new Animated.Value(0.9);
   const glowAnim = new Animated.Value(0);
