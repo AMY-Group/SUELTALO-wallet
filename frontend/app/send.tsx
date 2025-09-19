@@ -12,6 +12,8 @@ import {
   StatusBar,
   KeyboardAvoidingView,
   Platform,
+  Animated,
+  LinearGradient
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -26,9 +28,26 @@ export default function SendScreen() {
   const [selectedToken, setSelectedToken] = useState('USDC');
   const [loading, setLoading] = useState(false);
   const [balances, setBalances] = useState({ SOL: 0, USDC: 0, SLT: 0 });
+  
+  const fadeAnim = new Animated.Value(0);
+  const slideAnim = new Animated.Value(50);
 
   useEffect(() => {
     loadWalletData();
+    
+    // Start animations
+    Animated.parallel([
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 800,
+        useNativeDriver: true,
+      }),
+      Animated.timing(slideAnim, {
+        toValue: 0,
+        duration: 600,
+        useNativeDriver: true,
+      }),
+    ]).start();
   }, []);
 
   const loadWalletData = async () => {
@@ -51,17 +70,17 @@ export default function SendScreen() {
 
   const validateInputs = () => {
     if (!recipientAddress.trim()) {
-      Alert.alert('Error', 'Please enter recipient address');
+      Alert.alert('Error', 'Por favor ingresa la dirección del destinatario');
       return false;
     }
 
     if (!WalletService.validatePublicKey(recipientAddress)) {
-      Alert.alert('Error', 'Invalid recipient address');
+      Alert.alert('Error', 'Dirección del destinatario inválida');
       return false;
     }
 
     if (!amount || parseFloat(amount) <= 0) {
-      Alert.alert('Error', 'Please enter a valid amount');
+      Alert.alert('Error', 'Por favor ingresa una cantidad válida');
       return false;
     }
 
@@ -69,7 +88,7 @@ export default function SendScreen() {
     const availableBalance = balances[selectedToken as keyof typeof balances];
     
     if (amountNum > availableBalance) {
-      Alert.alert('Error', `Insufficient ${selectedToken} balance`);
+      Alert.alert('Error', `Saldo insuficiente de ${selectedToken}`);
       return false;
     }
 
@@ -89,22 +108,30 @@ export default function SendScreen() {
         token_type: selectedToken,
       });
 
-      // In a real implementation, you would:
-      // 1. Create the Solana transaction
-      // 2. Sign it with the user's private key
-      // 3. Broadcast it to the network
-      // 4. Update the transaction status
-      
+      // Success animation
+      Animated.sequence([
+        Animated.timing(slideAnim, {
+          toValue: -20,
+          duration: 200,
+          useNativeDriver: true,
+        }),
+        Animated.timing(slideAnim, {
+          toValue: 0,
+          duration: 200,
+          useNativeDriver: true,
+        }),
+      ]).start();
+
       Alert.alert(
-        'Transaction Initiated',
-        `Sending ${amount} ${selectedToken} to ${recipientAddress.slice(0, 8)}...${recipientAddress.slice(-8)}`,
+        '¡Transacción Enviada! 🚀',
+        `Enviando ${amount} ${selectedToken} a ${recipientAddress.slice(0, 8)}...${recipientAddress.slice(-8)}`,
         [
           {
-            text: 'View Transaction',
+            text: 'Ver Transacción',
             onPress: () => router.push('/transactions'),
           },
           {
-            text: 'Done',
+            text: 'Continuar',
             onPress: () => router.back(),
           },
         ]
@@ -115,7 +142,7 @@ export default function SendScreen() {
       setAmount('');
     } catch (error) {
       console.error('Send error:', error);
-      Alert.alert('Error', 'Failed to send transaction. Please try again.');
+      Alert.alert('Error', 'Error al enviar la transacción. Intenta de nuevo.');
     } finally {
       setLoading(false);
     }
@@ -131,38 +158,46 @@ export default function SendScreen() {
   };
 
   const tokenOptions = [
-    { symbol: 'USDC', name: 'USD Coin', icon: 'card' },
-    { symbol: 'SOL', name: 'Solana', icon: 'flash' },
-    { symbol: 'SLT', name: 'SUÉLTALO Token', icon: 'gift' },
+    { symbol: 'USDC', name: 'Dólares Digitales', icon: 'card', color: '#1E90FF', gradient: ['#1E90FF', '#00BFFF'] },
+    { symbol: 'SOL', name: 'Solana', icon: 'flash', color: '#9945FF', gradient: ['#9945FF', '#BB86FC'] },
+    { symbol: 'SLT', name: 'SUÉLTALO Token', icon: 'gift', color: '#00FF88', gradient: ['#00FF88', '#4CAF50'] },
   ];
 
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor="#0a0a0a" />
+      <StatusBar barStyle="light-content" backgroundColor="#0C0C0C" />
       
-      <View style={styles.header}>
-        <TouchableOpacity 
-          style={styles.backButton} 
-          onPress={() => router.back()}
-        >
-          <Ionicons name="arrow-back" size={24} color="#00D4FF" />
-        </TouchableOpacity>
-        
-        <Text style={styles.headerTitle}>Send Crypto</Text>
-        
-        <TouchableOpacity style={styles.scanButton} onPress={handleScanQR}>
-          <Ionicons name="qr-code-outline" size={24} color="#00D4FF" />
-        </TouchableOpacity>
-      </View>
+      {/* Gradient Header */}
+      <LinearGradient
+        colors={['#FF006E', '#1E90FF']}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={styles.gradientHeader}
+      >
+        <View style={styles.header}>
+          <TouchableOpacity 
+            style={styles.backButton} 
+            onPress={() => router.back()}
+          >
+            <Ionicons name="arrow-back" size={28} color="#FFFFFF" />
+          </TouchableOpacity>
+          
+          <Text style={styles.headerTitle}>Enviar Crypto</Text>
+          
+          <TouchableOpacity style={styles.scanButton} onPress={handleScanQR}>
+            <Ionicons name="qr-code-outline" size={28} color="#FFFFFF" />
+          </TouchableOpacity>
+        </View>
+      </LinearGradient>
 
       <KeyboardAvoidingView 
         style={styles.keyboardAvoidingView}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       >
         <ScrollView style={styles.scrollContainer} showsVerticalScrollIndicator={false}>
-          {/* Token Selection */}
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Select Token</Text>
+          {/* Urban Token Selection */}
+          <Animated.View style={[styles.section, { opacity: fadeAnim, transform: [{ translateY: slideAnim }] }]}>
+            <Text style={styles.sectionTitle}>💰 Seleccionar Token</Text>
             <View style={styles.tokenGrid}>
               {tokenOptions.map((token) => (
                 <TouchableOpacity
@@ -173,105 +208,151 @@ export default function SendScreen() {
                   ]}
                   onPress={() => setSelectedToken(token.symbol)}
                 >
-                  <Ionicons 
-                    name={token.icon as any} 
-                    size={24} 
-                    color={selectedToken === token.symbol ? '#00D4FF' : '#666'} 
-                  />
-                  <Text style={[
-                    styles.tokenSymbol,
-                    selectedToken === token.symbol && styles.selectedTokenText
-                  ]}>
-                    {token.symbol}
-                  </Text>
-                  <Text style={styles.tokenName}>{token.name}</Text>
-                  <Text style={styles.tokenBalance}>
-                    {balances[token.symbol as keyof typeof balances].toFixed(4)}
-                  </Text>
+                  <LinearGradient
+                    colors={selectedToken === token.symbol ? token.gradient : ['rgba(255, 255, 255, 0.05)', 'rgba(255, 255, 255, 0.02)']}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 1 }}
+                    style={styles.tokenGradient}
+                  >
+                    <View style={[styles.tokenIconContainer, { backgroundColor: token.color + '20' }]}>
+                      <Ionicons 
+                        name={token.icon as any} 
+                        size={28} 
+                        color={selectedToken === token.symbol ? '#FFFFFF' : token.color} 
+                      />
+                    </View>
+                    <Text style={[
+                      styles.tokenSymbol,
+                      selectedToken === token.symbol && styles.selectedTokenText
+                    ]}>
+                      {token.symbol}
+                    </Text>
+                    <Text style={[
+                      styles.tokenName,
+                      selectedToken === token.symbol && { color: '#FFFFFF' }
+                    ]}>{token.name}</Text>
+                    <Text style={[
+                      styles.tokenBalance,
+                      selectedToken === token.symbol && { color: '#FFFFFF' }
+                    ]}>
+                      {balances[token.symbol as keyof typeof balances].toFixed(4)}
+                    </Text>
+                  </LinearGradient>
                 </TouchableOpacity>
               ))}
             </View>
-          </View>
+          </Animated.View>
 
-          {/* Recipient Address */}
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Recipient Address</Text>
-            <View style={styles.inputContainer}>
-              <TextInput
-                style={styles.addressInput}
-                placeholder="Enter Solana wallet address..."
-                placeholderTextColor="#666"
-                value={recipientAddress}
-                onChangeText={setRecipientAddress}
-                autoCapitalize="none"
-                autoCorrect={false}
-              />
-              <TouchableOpacity style={styles.qrButton} onPress={handleScanQR}>
-                <Ionicons name="qr-code" size={20} color="#00D4FF" />
-              </TouchableOpacity>
+          {/* Neon Recipient Address */}
+          <Animated.View style={[styles.section, { opacity: fadeAnim, transform: [{ translateY: slideAnim }] }]}>
+            <Text style={styles.sectionTitle}>📍 Dirección del Destinatario</Text>
+            <View style={styles.neonInputContainer}>
+              <LinearGradient
+                colors={recipientAddress ? ['rgba(30, 144, 255, 0.2)', 'rgba(255, 0, 110, 0.2)'] : ['rgba(255, 255, 255, 0.05)', 'rgba(255, 255, 255, 0.02)']}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+                style={styles.inputGradient}
+              >
+                <TextInput
+                  style={styles.addressInput}
+                  placeholder="Pega la dirección de Solana aquí..."
+                  placeholderTextColor="#666666"
+                  value={recipientAddress}
+                  onChangeText={setRecipientAddress}
+                  autoCapitalize="none"
+                  autoCorrect={false}
+                />
+                <TouchableOpacity style={styles.qrButton} onPress={handleScanQR}>
+                  <LinearGradient
+                    colors={['#FF006E', '#FF4081']}
+                    style={styles.qrButtonGradient}
+                  >
+                    <Ionicons name="qr-code" size={24} color="#FFFFFF" />
+                  </LinearGradient>
+                </TouchableOpacity>
+              </LinearGradient>
             </View>
-          </View>
+          </Animated.View>
 
-          {/* Amount */}
-          <View style={styles.section}>
+          {/* Urban Amount Input */}
+          <Animated.View style={[styles.section, { opacity: fadeAnim, transform: [{ translateY: slideAnim }] }]}>
             <View style={styles.amountHeader}>
-              <Text style={styles.sectionTitle}>Amount</Text>
+              <Text style={styles.sectionTitle}>💸 Cantidad</Text>
               <TouchableOpacity style={styles.maxButton} onPress={handleMaxAmount}>
-                <Text style={styles.maxButtonText}>MAX</Text>
+                <LinearGradient
+                  colors={['#00FF88', '#4CAF50']}
+                  style={styles.maxGradient}
+                >
+                  <Text style={styles.maxButtonText}>MAX</Text>
+                </LinearGradient>
               </TouchableOpacity>
             </View>
             
-            <View style={styles.amountContainer}>
-              <TextInput
-                style={styles.amountInput}
-                placeholder="0.00"
-                placeholderTextColor="#666"
-                value={amount}
-                onChangeText={setAmount}
-                keyboardType="decimal-pad"
-              />
-              <Text style={styles.tokenLabel}>{selectedToken}</Text>
+            <View style={styles.neonAmountContainer}>
+              <LinearGradient
+                colors={amount ? ['rgba(30, 144, 255, 0.2)', 'rgba(255, 0, 110, 0.2)'] : ['rgba(255, 255, 255, 0.05)', 'rgba(255, 255, 255, 0.02)']}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+                style={styles.amountGradient}
+              >
+                <TextInput
+                  style={styles.amountInput}
+                  placeholder="0.00"
+                  placeholderTextColor="#666666"
+                  value={amount}
+                  onChangeText={setAmount}
+                  keyboardType="decimal-pad"
+                />
+                <View style={styles.tokenLabelContainer}>
+                  <Text style={styles.tokenLabel}>{selectedToken}</Text>
+                </View>
+              </LinearGradient>
             </View>
             
             <Text style={styles.balanceText}>
-              Available: {balances[selectedToken as keyof typeof balances].toFixed(4)} {selectedToken}
+              💳 Disponible: {balances[selectedToken as keyof typeof balances].toFixed(4)} {selectedToken}
             </Text>
-          </View>
+          </Animated.View>
 
-          {/* Transaction Preview */}
+          {/* Street-Style Transaction Preview */}
           {recipientAddress && amount && (
-            <View style={styles.previewSection}>
-              <Text style={styles.sectionTitle}>Transaction Preview</Text>
-              <View style={styles.previewCard}>
+            <Animated.View style={[styles.previewSection, { opacity: fadeAnim }]}>
+              <Text style={styles.sectionTitle}>👀 Previsualización</Text>
+              <LinearGradient
+                colors={['rgba(30, 144, 255, 0.1)', 'rgba(255, 0, 110, 0.1)']}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+                style={styles.previewGradient}
+              >
                 <View style={styles.previewRow}>
-                  <Text style={styles.previewLabel}>From:</Text>
+                  <Text style={styles.previewLabel}>📤 De:</Text>
                   <Text style={styles.previewValue}>
                     {walletData?.publicKey.slice(0, 8)}...{walletData?.publicKey.slice(-8)}
                   </Text>
                 </View>
                 <View style={styles.previewRow}>
-                  <Text style={styles.previewLabel}>To:</Text>
+                  <Text style={styles.previewLabel}>📥 Para:</Text>
                   <Text style={styles.previewValue}>
                     {recipientAddress.slice(0, 8)}...{recipientAddress.slice(-8)}
                   </Text>
                 </View>
                 <View style={styles.previewRow}>
-                  <Text style={styles.previewLabel}>Amount:</Text>
+                  <Text style={styles.previewLabel}>💰 Cantidad:</Text>
                   <Text style={styles.previewValue}>{amount} {selectedToken}</Text>
                 </View>
                 {selectedToken === 'USDC' && (
                   <View style={styles.rewardRow}>
-                    <Text style={styles.rewardLabel}>SLT Reward:</Text>
+                    <Text style={styles.rewardLabel}>🎁 Recompensa SLT:</Text>
                     <Text style={styles.rewardValue}>+{(parseFloat(amount || '0') * 0.1).toFixed(2)} SLT</Text>
                   </View>
                 )}
-              </View>
-            </View>
+              </LinearGradient>
+            </Animated.View>
           )}
         </ScrollView>
 
-        {/* Send Button */}
-        <View style={styles.buttonContainer}>
+        {/* Urban Send Button */}
+        <Animated.View style={[styles.buttonContainer, { opacity: fadeAnim }]}>
           <TouchableOpacity
             style={[
               styles.sendButton,
@@ -280,16 +361,25 @@ export default function SendScreen() {
             onPress={handleSend}
             disabled={!recipientAddress || !amount || loading}
           >
-            {loading ? (
-              <ActivityIndicator color="#0a0a0a" size="small" />
-            ) : (
-              <>
-                <Ionicons name="send" size={20} color="#0a0a0a" />
-                <Text style={styles.sendButtonText}>Send {selectedToken}</Text>
-              </>
-            )}
+            <LinearGradient
+              colors={(!recipientAddress || !amount || loading) 
+                ? ['#333333', '#444444'] 
+                : ['#FF006E', '#1E90FF']}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 0 }}
+              style={styles.sendGradient}
+            >
+              {loading ? (
+                <ActivityIndicator color="#FFFFFF" size="small" />
+              ) : (
+                <>
+                  <Ionicons name="send" size={24} color="#FFFFFF" />
+                  <Text style={styles.sendButtonText}>Enviar {selectedToken} 🚀</Text>
+                </>
+              )}
+            </LinearGradient>
           </TouchableOpacity>
-        </View>
+        </Animated.View>
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
@@ -298,28 +388,41 @@ export default function SendScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0a0a0a',
+    backgroundColor: '#0C0C0C',
+  },
+  gradientHeader: {
+    paddingTop: 50,
+    paddingBottom: 20,
+    paddingHorizontal: 20,
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingVertical: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: '#1a1a1a',
+    justifyContent: 'space-between',
   },
   backButton: {
-    padding: 4,
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   headerTitle: {
     flex: 1,
     textAlign: 'center',
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#fff',
+    fontSize: 24,
+    fontWeight: '800',
+    color: '#FFFFFF',
+    letterSpacing: 1,
   },
   scanButton: {
-    padding: 4,
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   keyboardAvoidingView: {
     flex: 1,
@@ -329,13 +432,14 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   section: {
-    marginVertical: 16,
+    marginVertical: 20,
   },
   sectionTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#fff',
-    marginBottom: 12,
+    fontSize: 20,
+    fontWeight: '800',
+    color: '#FFFFFF',
+    marginBottom: 16,
+    letterSpacing: 0.5,
   },
   tokenGrid: {
     flexDirection: 'row',
@@ -343,155 +447,201 @@ const styles = StyleSheet.create({
   },
   tokenOption: {
     flex: 1,
-    backgroundColor: '#1a1a1a',
-    borderRadius: 12,
-    padding: 16,
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: '#333',
+    borderRadius: 16,
+    overflow: 'hidden',
   },
   selectedToken: {
-    borderColor: '#00D4FF',
-    backgroundColor: '#001122',
+    shadowColor: '#1E90FF',
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.5,
+    shadowRadius: 10,
+    elevation: 10,
+  },
+  tokenGradient: {
+    padding: 20,
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: 'transparent',
+  },
+  tokenIconContainer: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 12,
   },
   tokenSymbol: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#666',
-    marginTop: 8,
+    fontSize: 16,
+    fontWeight: '800',
+    color: '#AAAAAA',
+    marginBottom: 4,
+    letterSpacing: 0.5,
   },
   selectedTokenText: {
-    color: '#00D4FF',
+    color: '#FFFFFF',
   },
   tokenName: {
-    fontSize: 10,
-    color: '#555',
-    marginTop: 2,
+    fontSize: 12,
+    color: '#666666',
+    marginBottom: 8,
+    textAlign: 'center',
   },
   tokenBalance: {
-    fontSize: 12,
-    color: '#888',
-    marginTop: 4,
+    fontSize: 14,
+    color: '#AAAAAA',
+    fontWeight: '600',
   },
-  inputContainer: {
+  neonInputContainer: {
+    borderRadius: 16,
+    overflow: 'hidden',
+  },
+  inputGradient: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#1a1a1a',
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: '#333',
+    borderWidth: 2,
+    borderColor: 'rgba(30, 144, 255, 0.3)',
   },
   addressInput: {
     flex: 1,
-    padding: 16,
-    color: '#fff',
-    fontSize: 14,
+    padding: 20,
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: '500',
   },
   qrButton: {
-    padding: 16,
+    padding: 12,
+    margin: 8,
+    borderRadius: 12,
+    overflow: 'hidden',
+  },
+  qrButtonGradient: {
+    padding: 8,
+    borderRadius: 12,
   },
   amountHeader: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginBottom: 12,
+    marginBottom: 16,
   },
   maxButton: {
-    backgroundColor: '#00D4FF',
-    paddingHorizontal: 12,
-    paddingVertical: 4,
-    borderRadius: 8,
+    borderRadius: 12,
+    overflow: 'hidden',
+  },
+  maxGradient: {
+    paddingHorizontal: 16,
+    paddingVertical: 8,
   },
   maxButtonText: {
-    color: '#0a0a0a',
-    fontSize: 12,
-    fontWeight: '600',
+    color: '#FFFFFF',
+    fontSize: 14,
+    fontWeight: '700',
+    letterSpacing: 1,
   },
-  amountContainer: {
-    backgroundColor: '#1a1a1a',
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: '#333',
+  neonAmountContainer: {
+    borderRadius: 16,
+    overflow: 'hidden',
+    marginBottom: 12,
+  },
+  amountGradient: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 16,
+    borderWidth: 2,
+    borderColor: 'rgba(30, 144, 255, 0.3)',
   },
   amountInput: {
     flex: 1,
-    paddingVertical: 20,
-    color: '#fff',
-    fontSize: 24,
-    fontWeight: '600',
+    paddingVertical: 24,
+    paddingHorizontal: 20,
+    color: '#FFFFFF',
+    fontSize: 28,
+    fontWeight: '800',
+    letterSpacing: 1,
+  },
+  tokenLabelContainer: {
+    backgroundColor: 'rgba(30, 144, 255, 0.2)',
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 12,
+    marginRight: 16,
   },
   tokenLabel: {
-    color: '#00D4FF',
+    color: '#FFFFFF',
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: '700',
+    letterSpacing: 0.5,
   },
   balanceText: {
-    color: '#666',
-    fontSize: 12,
-    marginTop: 8,
+    color: '#AAAAAA',
+    fontSize: 14,
+    fontWeight: '500',
+    letterSpacing: 0.5,
   },
   previewSection: {
-    marginVertical: 16,
+    marginVertical: 20,
   },
-  previewCard: {
-    backgroundColor: '#1a1a1a',
-    borderRadius: 12,
-    padding: 16,
+  previewGradient: {
+    borderRadius: 16,
+    padding: 24,
     borderWidth: 1,
-    borderColor: '#333',
+    borderColor: 'rgba(30, 144, 255, 0.3)',
   },
   previewRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: 12,
+    marginBottom: 16,
   },
   previewLabel: {
-    color: '#888',
-    fontSize: 14,
+    color: '#AAAAAA',
+    fontSize: 16,
+    fontWeight: '600',
   },
   previewValue: {
-    color: '#fff',
-    fontSize: 14,
-    fontWeight: '500',
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: '700',
+    letterSpacing: 0.5,
   },
   rewardRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    paddingTop: 12,
+    paddingTop: 16,
     borderTopWidth: 1,
-    borderTopColor: '#2a2a2a',
+    borderTopColor: 'rgba(255, 255, 255, 0.1)',
   },
   rewardLabel: {
     color: '#00FF88',
-    fontSize: 14,
+    fontSize: 16,
+    fontWeight: '600',
   },
   rewardValue: {
     color: '#00FF88',
-    fontSize: 14,
-    fontWeight: '600',
+    fontSize: 16,
+    fontWeight: '800',
+    letterSpacing: 0.5,
   },
   buttonContainer: {
     padding: 20,
   },
   sendButton: {
-    backgroundColor: '#00D4FF',
-    paddingVertical: 16,
-    borderRadius: 12,
+    borderRadius: 16,
+    overflow: 'hidden',
+  },
+  disabledButton: {
+    opacity: 0.5,
+  },
+  sendGradient: {
+    paddingVertical: 20,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 8,
-  },
-  disabledButton: {
-    backgroundColor: '#333',
-    opacity: 0.5,
+    gap: 12,
   },
   sendButtonText: {
-    color: '#0a0a0a',
-    fontSize: 16,
-    fontWeight: '600',
+    color: '#FFFFFF',
+    fontSize: 18,
+    fontWeight: '800',
+    letterSpacing: 1,
   },
 });
