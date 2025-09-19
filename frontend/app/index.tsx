@@ -55,9 +55,9 @@ export default function Index() {
     );
   }
 
-  // Show welcome screen for first-time users
+  // Show splash screen for first-time users
   if (!hasSeenWelcome) {
-    return <Redirect href="/welcome" />;
+    return <Redirect href="/(onboarding)/splash" />;
   }
 
   // Redirect based on wallet existence
@@ -65,8 +65,8 @@ export default function Index() {
     console.log('Wallet found, redirecting to /(wallet)/home');
     return <Redirect href="/(wallet)/home" />;
   } else {
-    console.log('No wallet found, redirecting to /(onboarding)/create');
-    return <Redirect href="/(onboarding)/create" />;
+    console.log('No wallet found, redirecting to /(onboarding)/final');
+    return <Redirect href="/(onboarding)/final" />;
   }
 }
 
