@@ -484,17 +484,17 @@ const styles = StyleSheet.create({
     elevation: 20,
   },
   usdcCard: {
-    shadowColor: '#1E90FF',
+    boxShadow: '0px 0px 20px rgba(30, 144, 255, 0.6)',
     borderWidth: 2,
     borderColor: '#1E90FF',
   },
   sltCard: {
-    shadowColor: '#FF006E',
+    boxShadow: '0px 0px 20px rgba(255, 0, 110, 0.6)',
     borderWidth: 2,
     borderColor: '#FF006E',
   },
   solCard: {
-    shadowColor: '#00FF88',
+    boxShadow: '0px 0px 20px rgba(0, 255, 136, 0.6)',
     borderWidth: 2,
     borderColor: '#00FF88',
   },
