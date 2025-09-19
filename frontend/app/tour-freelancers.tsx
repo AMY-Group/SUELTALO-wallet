@@ -17,8 +17,8 @@ export default function TourFreelancersScreen() {
   const router = useRouter();
 
   const handleContinue = () => {
-    // End of tour, navigate to onboarding
-    router.push('/(onboarding)/create');
+    // End of tour, navigate to final CTA
+    router.push('/onboarding-cta');
   };
 
   const handleSkip = () => {
