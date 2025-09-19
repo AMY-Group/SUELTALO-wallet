@@ -556,6 +556,9 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#0C0C0C',
   },
+  contentContainer: {
+    flex: 1,
+  },
   loadingContainer: {
     flex: 1,
     backgroundColor: '#0C0C0C',
