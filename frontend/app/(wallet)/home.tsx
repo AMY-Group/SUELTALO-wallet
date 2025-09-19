@@ -184,12 +184,12 @@ export default function DashboardScreen() {
 
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
-    if (walletData) {
-      await loadBalances(walletData.publicKey);
-      await loadTransactions(walletData.publicKey);
+    if (publicKey) {
+      await loadDevnetBalances(publicKey);
+      setLastUpdated(new Date());
     }
     setRefreshing(false);
-  }, [walletData]);
+  }, [publicKey]);
 
   const handleSend = () => {
     router.push('/send');
