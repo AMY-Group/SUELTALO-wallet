@@ -410,7 +410,7 @@ export default function DashboardScreen() {
                           {tx.from_address === publicKey ? 'Mandaste' : 'Te llegó'} {tx.token_type}
                         </Text>
                         <Text style={styles.activityAmount}>
-                          {tx.from_address === walletData?.publicKey ? '-' : '+'}
+                          {tx.from_address === publicKey ? '-' : '+'}
                           {formatAmount(tx.amount)} {tx.token_type}
                         </Text>
                       </View>
