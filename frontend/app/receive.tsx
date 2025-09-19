@@ -10,8 +10,8 @@ import {
   StatusBar,
   ScrollView,
   Animated,
-  LinearGradient
 } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import QRCode from 'react-native-qrcode-svg';
