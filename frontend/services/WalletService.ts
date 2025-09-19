@@ -31,6 +31,37 @@ export class WalletService {
   private static readonly WALLET_KEY = '@wallet_data';
   private static readonly SEED_PHRASE_KEY = '@secure_seed_phrase';
 
+  // Cross-platform secure storage helpers
+  private static async setSecureItem(key: string, value: string): Promise<void> {
+    if (Platform.OS === 'web') {
+      // Use AsyncStorage for web
+      await AsyncStorage.setItem(key, value);
+    } else {
+      // Use SecureStore for native
+      await SecureStore.setItemAsync(key, value);
+    }
+  }
+
+  private static async getSecureItem(key: string): Promise<string | null> {
+    if (Platform.OS === 'web') {
+      // Use AsyncStorage for web
+      return await AsyncStorage.getItem(key);
+    } else {
+      // Use SecureStore for native
+      return await SecureStore.getItemAsync(key);
+    }
+  }
+
+  private static async deleteSecureItem(key: string): Promise<void> {
+    if (Platform.OS === 'web') {
+      // Use AsyncStorage for web
+      await AsyncStorage.removeItem(key);
+    } else {
+      // Use SecureStore for native
+      await SecureStore.deleteItemAsync(key);
+    }
+  }
+
   private static generateSecureRandom(length: number): Uint8Array {
     // Use crypto.getRandomValues if available (in secure contexts)
     if (typeof crypto !== 'undefined' && crypto.getRandomValues) {
