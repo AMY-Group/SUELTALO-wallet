@@ -30,8 +30,8 @@ const defaultBalance = { SOL: 0, USDC: 0, SLT: null };
 export default function DashboardScreen() {
   const router = useRouter();
   const [publicKey, setPublicKey] = useState<string | null>(null);
-  const [balances, setBalances] = useState<Balance>({ SOL: 0, USDC: 0, SLT: null });
-  const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [balances, setBalances] = useState(defaultBalance);
+  const [transactions, setTransactions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [activeTab, setActiveTab] = useState('inicio');
