@@ -201,14 +201,31 @@ export default function DashboardScreen() {
           </LinearGradient>
         </View>
 
-        <ScrollView 
-          style={styles.scrollContainer}
-          contentContainerStyle={styles.scrollContent}
-          refreshControl={
-            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-          }
-          showsVerticalScrollIndicator={false}
-        >
+        <View style={styles.contentContainer}>
+          <ScrollView 
+            contentContainerStyle={styles.scrollContent}
+            refreshControl={
+              <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+            }
+            showsVerticalScrollIndicator={false}
+          >
+            {/* DEBUG BLOCK */}
+            <View style={styles.debugBlock}>
+              <Text style={styles.debugText}>SUÉLTALO • Dashboard activo</Text>
+            </View>
+
+            {/* DEBUG NEON CARD PLACEHOLDERS */}
+            <View style={styles.debugCardsContainer}>
+              <View style={[styles.debugCard, styles.debugCardUsdc]}>
+                <Text style={styles.debugCardLabel}>USDC</Text>
+              </View>
+              <View style={[styles.debugCard, styles.debugCardSlt]}>
+                <Text style={styles.debugCardLabel}>SLT</Text>
+              </View>
+              <View style={[styles.debugCard, styles.debugCardSol]}>
+                <Text style={styles.debugCardLabel}>SOL</Text>
+              </View>
+            </View>
         {/* Neon Glowing Balance Cards */}
         <Animated.View style={[styles.balancesSection, { opacity: fadeAnim, transform: [{ scale: bounceAnim }] }]}>
           <Text style={styles.sectionTitle}>Tu Lana 💰</Text>
