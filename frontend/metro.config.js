@@ -11,13 +11,19 @@ config.cacheStores = [
   new FileStore({ root: path.join(root, 'cache') }),
 ];
 
+// Configure resolver for crypto modules
+config.resolver.resolverMainFields = ['react-native', 'browser', 'main'];
+config.resolver.platforms = ['ios', 'android', 'native', 'web'];
 
-// // Exclude unnecessary directories from file watching
-// config.watchFolders = [__dirname];
-// config.resolver.blacklistRE = /(.*)\/(__tests__|android|ios|build|dist|.git|node_modules\/.*\/android|node_modules\/.*\/ios|node_modules\/.*\/windows|node_modules\/.*\/macos)(\/.*)?$/;
+// Add polyfill aliases for Node.js modules
+config.resolver.alias = {
+  'crypto': require.resolve('react-native-get-random-values'),
+  'stream': require.resolve('stream-browserify'),
+  'buffer': require.resolve('buffer'),
+};
 
-// // Alternative: use a more aggressive exclusion pattern
-// config.resolver.blacklistRE = /node_modules\/.*\/(android|ios|windows|macos|__tests__|\.git|.*\.android\.js|.*\.ios\.js)$/;
+// Enable package exports
+config.resolver.unstable_enablePackageExports = true;
 
 // Reduce the number of workers to decrease resource usage
 config.maxWorkers = 2;
