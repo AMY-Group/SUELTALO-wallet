@@ -24,22 +24,8 @@ import { ErrorBoundary } from '../../components/ErrorBoundary';
 
 const { width } = Dimensions.get('window');
 
-type Balance = {
-  SOL: number;
-  USDC: number;
-  SLT: number | null;
-};
-
-type Transaction = {
-  id: string;
-  from_address: string;
-  to_address: string;
-  amount: number;
-  token_type: string;
-  status: string;
-  timestamp: string;
-  reward_slt: number;
-};
+// Types
+const defaultBalance = { SOL: 0, USDC: 0, SLT: null };
 
 export default function DashboardScreen() {
   const router = useRouter();
