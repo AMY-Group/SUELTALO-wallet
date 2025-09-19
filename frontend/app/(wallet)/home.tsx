@@ -55,6 +55,15 @@ export default function DashboardScreen() {
   const bounceAnim = new Animated.Value(0.9);
   const glowAnim = new Animated.Value(0);
 
+  // Solana connection
+  const connection = new Connection(
+    Constants.expoConfig?.extra?.EXPO_PUBLIC_SOLANA_RPC || 'https://api.devnet.solana.com'
+  );
+
+  // Constants from environment
+  const USDC_MINT = Constants.expoConfig?.extra?.EXPO_PUBLIC_USDC_MINT || '4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU';
+  const SLT_MINT = Constants.expoConfig?.extra?.EXPO_PUBLIC_SLT_MINT;
+
   useEffect(() => {
     console.info('DASHBOARD_RENDER_OK');
     loadWalletData();
