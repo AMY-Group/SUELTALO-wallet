@@ -24,28 +24,24 @@ export default function OnboardingCTAScreen() {
     try {
       setIsCreating(true);
       
-      // Generate mnemonic phrase
-      const mnemonic = bip39.generateMnemonic();
+      // Use WalletService to generate wallet
+      const walletData = await WalletService.generateWallet();
       
-      // Generate keypair from mnemonic
-      const seed = await bip39.mnemonicToSeed(mnemonic);
-      const keypair = Keypair.fromSeed(seed.slice(0, 32));
-      
-      // Store in SecureStore
-      await SecureStore.setItemAsync('secret', mnemonic);
-      await SecureStore.setItemAsync('publicKey', keypair.publicKey.toBase58());
-      
-      console.log('Wallet created successfully');
-      Alert.alert(
-        '¡Wallet creada! 🎉',
-        'Tu billetera fue creada exitosamente. ¡Ya podés empezar a usar SUÉLTALO!',
-        [
-          {
-            text: '¡Dale!',
-            onPress: () => router.replace('/(wallet)/home')
-          }
-        ]
-      );
+      if (walletData) {
+        console.log('Wallet created successfully');
+        Alert.alert(
+          '¡Wallet creada! 🎉',
+          'Tu billetera fue creada exitosamente. ¡Ya podés empezar a usar SUÉLTALO!',
+          [
+            {
+              text: '¡Dale!',
+              onPress: () => router.replace('/(wallet)/home')
+            }
+          ]
+        );
+      } else {
+        throw new Error('Failed to generate wallet');
+      }
     } catch (error) {
       console.error('Error creating wallet:', error);
       Alert.alert(
