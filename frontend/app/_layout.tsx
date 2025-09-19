@@ -18,18 +18,7 @@ export default function RootLayout() {
             contentStyle: { backgroundColor: '#0C0C0C' },
             animation: 'slide_from_right',
           }}
-        >
-          <Stack.Screen name="index" />
-          <Stack.Screen name="onboarding/index" />
-          <Stack.Screen name="onboarding/create" />
-          <Stack.Screen name="onboarding/import" />
-          <Stack.Screen name="dashboard" />
-          <Stack.Screen name="send" />
-          <Stack.Screen name="receive" />
-          <Stack.Screen name="rewards" />
-          <Stack.Screen name="kyc" />
-          <Stack.Screen name="transactions" />
-        </Stack>
+        />
       </SafeAreaView>
     </ErrorBoundary>
   );
