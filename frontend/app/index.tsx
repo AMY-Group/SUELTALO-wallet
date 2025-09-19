@@ -391,7 +391,19 @@ const styles = StyleSheet.create({
     letterSpacing: 0.5,
   },
   buttonIcon: {
+    fontSize: 18,
     marginRight: 12,
+  },
+  secondaryButtonIcon: {
+    fontSize: 18,
+    marginRight: 12,
+  },
+  walletIcon: {
+    fontSize: 80,
+    color: '#00FF88',
+  },
+  featureEmoji: {
+    fontSize: 28,
   },
   features: {
     flexDirection: 'row',
