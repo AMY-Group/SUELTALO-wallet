@@ -106,9 +106,14 @@ export default function DashboardScreen() {
       const storedSecret = await SecureStore.getItemAsync('secret');
       const storedPublicKey = await SecureStore.getItemAsync('publicKey');
       
+      // TEMPORARY: For testing, simulate wallet existence with a valid Devnet pubkey
+      const testPublicKey = '8xznGNTGmH7bA1Mn5mU3zVwzz7rGT9LWKCfzE3yJR3oK'; // Example Devnet pubkey
+      
       if (!storedSecret || !storedPublicKey) {
-        console.log('No wallet found in SecureStore, showing CTA');
-        setShowWalletCTA(true);
+        console.log('No wallet found in SecureStore, using test pubkey for demo');
+        setPublicKey(testPublicKey);
+        await loadDevnetBalances(testPublicKey);
+        setLastUpdated(new Date());
         setLoading(false);
         return;
       }
