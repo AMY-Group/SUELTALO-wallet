@@ -12,8 +12,7 @@ import {
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import * as SecureStore from 'expo-secure-store';
-import { Keypair } from '@solana/web3.js';
-import * as bip39 from 'bip39';
+import { WalletService } from '../../services/WalletService';
 
 const { width, height } = Dimensions.get('window');
 
