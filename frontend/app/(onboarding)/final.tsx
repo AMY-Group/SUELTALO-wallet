@@ -25,7 +25,7 @@ export default function OnboardingCTAScreen() {
       setIsCreating(true);
       
       // Use WalletService to generate wallet
-      const walletData = await WalletService.generateWallet();
+      const walletData = await WalletService.generateNewWallet();
       
       if (walletData) {
         console.log('Wallet created successfully');
