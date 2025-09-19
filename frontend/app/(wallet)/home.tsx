@@ -407,7 +407,7 @@ export default function DashboardScreen() {
                       </View>
                       <View style={styles.activityDetails}>
                         <Text style={styles.activityType}>
-                          {tx.from_address === walletData?.publicKey ? 'Mandaste' : 'Te llegó'} {tx.token_type}
+                          {tx.from_address === publicKey ? 'Mandaste' : 'Te llegó'} {tx.token_type}
                         </Text>
                         <Text style={styles.activityAmount}>
                           {tx.from_address === walletData?.publicKey ? '-' : '+'}
