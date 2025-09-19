@@ -312,6 +312,10 @@ const styles = StyleSheet.create({
     shadowRadius: 20,
     elevation: 20,
   },
+  primaryButtonDisabled: {
+    shadowColor: '#666666',
+    shadowOpacity: 0.4,
+  },
   primaryButtonGradient: {
     paddingVertical: 20,
     paddingHorizontal: 40,
