@@ -162,20 +162,21 @@ export default function DashboardScreen() {
     return amount.toFixed(decimals);
   };
 
-  if (loading) {
-    return (
-      <SafeAreaView style={styles.loadingContainer}>
-        <LinearGradient
-          colors={['#1E90FF', '#FF006E']}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-          style={styles.gradientOverlay}
-        >
-          <Text style={styles.loadingText}>Cargando tu billetera... 💰</Text>
-        </LinearGradient>
-      </SafeAreaView>
-    );
-  }
+  // TEMPORARY: Skip loading screen to test debug blocks
+  // if (loading) {
+  //   return (
+  //     <SafeAreaView style={styles.loadingContainer}>
+  //       <LinearGradient
+  //         colors={['#1E90FF', '#FF006E']}
+  //         start={{ x: 0, y: 0 }}
+  //         end={{ x: 1, y: 1 }}
+  //         style={styles.gradientOverlay}
+  //       >
+  //         <Text style={styles.loadingText}>Cargando tu billetera... 💰</Text>
+  //       </LinearGradient>
+  //     </SafeAreaView>
+  //   );
+  // }
 
   return (
     <ErrorBoundary>
