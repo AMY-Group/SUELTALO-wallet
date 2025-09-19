@@ -249,6 +249,47 @@ export default function DashboardScreen() {
     );
   }
 
+  if (showWalletCTA) {
+    return (
+      <ErrorBoundary>
+        <SafeAreaView style={styles.container}>
+          <StatusBar barStyle="light-content" backgroundColor="#0C0C0C" />
+          
+          <View style={styles.contentContainer}>
+            <View style={styles.ctaContainer}>
+              <Text style={styles.ctaEmoji}>💰</Text>
+              <Text style={styles.ctaTitle}>¡Dale, empecemos!</Text>
+              <Text style={styles.ctaSubtitle}>
+                Necesitas crear o importar una billetera para ver tus balances
+              </Text>
+              
+              <TouchableOpacity 
+                style={styles.ctaButton} 
+                onPress={() => router.push('/(onboarding)/create')}
+              >
+                <LinearGradient
+                  colors={['#1E90FF', '#FF006E']}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 0 }}
+                  style={styles.gradientButton}
+                >
+                  <Text style={styles.ctaButtonText}>Crear mi billetera</Text>
+                </LinearGradient>
+              </TouchableOpacity>
+              
+              <TouchableOpacity 
+                style={styles.ctaSecondaryButton}
+                onPress={() => router.push('/(onboarding)/import')}
+              >
+                <Text style={styles.ctaSecondaryText}>Ya tengo una</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </SafeAreaView>
+      </ErrorBoundary>
+    );
+  }
+
   return (
     <ErrorBoundary>
       <SafeAreaView style={styles.container}>
