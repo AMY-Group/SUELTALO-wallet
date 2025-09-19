@@ -7,11 +7,11 @@ export default function OnboardingIndex() {
   const router = useRouter();
 
   const handleCreateWallet = () => {
-    router.push('/onboarding/create');
+    router.push('/(onboarding)/create');
   };
 
   const handleImportWallet = () => {
-    router.push('/onboarding/import');
+    router.push('/(onboarding)/import');
   };
 
   return (
