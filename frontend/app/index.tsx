@@ -184,21 +184,21 @@ export default function WelcomeScreen() {
         <View style={styles.features}>
           <View style={styles.feature}>
             <View style={styles.featureIcon}>
-              <Ionicons name="shield-checkmark" size={28} color="#00FF88" />
+              <Text style={styles.featureEmoji}>🛡️</Text>
             </View>
             <Text style={styles.featureText}>Tu Control</Text>
             <Text style={styles.featureSubtext}>Sin intermediarios</Text>
           </View>
           <View style={styles.feature}>
             <View style={styles.featureIcon}>
-              <Ionicons name="flash" size={28} color="#1E90FF" />
+              <Text style={styles.featureEmoji}>⚡</Text>
             </View>
             <Text style={styles.featureText}>Al Toque</Text>
             <Text style={styles.featureSubtext}>Súper rápido</Text>
           </View>
           <View style={styles.feature}>
             <View style={styles.featureIcon}>
-              <Ionicons name="gift" size={28} color="#FF006E" />
+              <Text style={styles.featureEmoji}>🎁</Text>
             </View>
             <Text style={styles.featureText}>Premios</Text>
             <Text style={styles.featureSubtext}>Por cada envío</Text>
