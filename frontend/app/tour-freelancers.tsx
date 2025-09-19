@@ -17,8 +17,8 @@ export default function TourFreelancersScreen() {
   const router = useRouter();
 
   const handleContinue = () => {
-    // Navigate to next tour step (3/3)
-    router.push('/tour-empresarios');
+    // End of tour, navigate to onboarding
+    router.push('/(onboarding)/create');
   };
 
   const handleSkip = () => {
@@ -31,7 +31,7 @@ export default function TourFreelancersScreen() {
       
       {/* Gradient Header */}
       <LinearGradient
-        colors={['#FF006E', '#8B5CF6']}
+        colors={['#1E90FF', '#FF006E']}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
         style={styles.gradientHeader}
@@ -58,45 +58,56 @@ export default function TourFreelancersScreen() {
 
         {/* Subtext */}
         <Text style={styles.subtext}>
-          Cobrá en USDC directo del cliente. Sin bancos, sin demoras, sin comisiones locas
+          Trabaja donde quieras, cobra aquí
         </Text>
 
         {/* Feature Points */}
         <View style={styles.featuresContainer}>
           <View style={styles.featureItem}>
             <Text style={styles.featureEmoji}>🌍</Text>
-            <Text style={styles.featureText}>Clientes de todo el mundo</Text>
+            <Text style={styles.featureText}>Clientes internacionales</Text>
           </View>
           <View style={styles.featureItem}>
-            <Text style={styles.featureEmoji}>💰</Text>
-            <Text style={styles.featureText}>Directo a tu wallet</Text>
+            <Text style={styles.featureEmoji}>⚡</Text>
+            <Text style={styles.featureText}>Pagos instantáneos</Text>
           </View>
           <View style={styles.featureItem}>
-            <Text style={styles.featureEmoji}>🚀</Text>
-            <Text style={styles.featureText}>Sin intermediarios</Text>
+            <Text style={styles.featureEmoji}>🏖️</Text>
+            <Text style={styles.featureText}>Libertad geográfica</Text>
+          </View>
+        </View>
+
+        {/* Freelancer Benefits */}
+        <View style={styles.benefitsContainer}>
+          <Text style={styles.benefitsTitle}>Perfect para freelancers:</Text>
+          <View style={styles.benefitsList}>
+            <Text style={styles.benefitItem}>✅ Desarrollo web & apps</Text>
+            <Text style={styles.benefitItem}>✅ Diseño gráfico</Text>
+            <Text style={styles.benefitItem}>✅ Marketing digital</Text>
+            <Text style={styles.benefitItem}>✅ Consultoría IT</Text>
           </View>
         </View>
       </View>
 
       {/* Bottom Section */}
       <View style={styles.bottomSection}>
-        {/* Navigation Dots Indicator (Step 2/3) */}
+        {/* Navigation Dots Indicator (Step 3/3) */}
         <View style={styles.dotsContainer}>
           <View style={styles.dot} />
-          <View style={[styles.dot, styles.activeDot]} />
           <View style={styles.dot} />
+          <View style={[styles.dot, styles.activeDot]} />
         </View>
-        <Text style={styles.stepText}>2/3</Text>
+        <Text style={styles.stepText}>3/3</Text>
 
         {/* Continue Button */}
         <TouchableOpacity style={styles.continueButton} onPress={handleContinue}>
           <LinearGradient
-            colors={['#FF006E', '#8B5CF6']}
+            colors={['#1E90FF', '#FF006E']}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
             style={styles.buttonGradient}
           >
-            <Text style={styles.buttonText}>Continuar</Text>
+            <Text style={styles.buttonText}>¡Empezar ahora!</Text>
           </LinearGradient>
         </TouchableOpacity>
       </View>
