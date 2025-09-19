@@ -18,11 +18,11 @@ export default function TourFreelancersScreen() {
 
   const handleContinue = () => {
     // End of tour, navigate to final CTA
-    router.push('/onboarding-cta');
+    router.push('/(onboarding)/final');
   };
 
   const handleSkip = () => {
-    router.push('/(onboarding)/create');
+    router.push('/(onboarding)/final');
   };
 
   return (
