@@ -89,10 +89,8 @@ export default function DashboardScreen() {
     try {
       const wallet = await WalletService.getStoredWalletData();
       if (!wallet) {
-        // TEMPORARY: Show debug content even without wallet
-        console.log('No wallet found, showing debug content anyway');
-        setLoading(false);
-        return; // Don't redirect, just show debug content
+        router.replace('/');
+        return;
       }
       
       setWalletData(wallet);
