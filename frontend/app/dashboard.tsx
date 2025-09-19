@@ -414,10 +414,15 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     letterSpacing: 1,
   },
+  headerContainer: {
+    height: 140,
+  },
   gradientHeader: {
+    flex: 1,
     paddingTop: 50,
     paddingBottom: 20,
     paddingHorizontal: 20,
+    justifyContent: 'center',
   },
   header: {
     flexDirection: 'row',
