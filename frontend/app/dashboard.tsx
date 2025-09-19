@@ -44,13 +44,17 @@ export default function DashboardScreen() {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [activeTab, setActiveTab] = useState('inicio');
   const fadeAnim = new Animated.Value(0);
   const bounceAnim = new Animated.Value(0.9);
+  const glowAnim = new Animated.Value(0);
 
   useEffect(() => {
     loadWalletData();
-    
-    // Start animations
+    startAnimations();
+  }, []);
+
+  const startAnimations = () => {
     Animated.parallel([
       Animated.timing(fadeAnim, {
         toValue: 1,
@@ -63,8 +67,22 @@ export default function DashboardScreen() {
         friction: 8,
         useNativeDriver: true,
       }),
+      Animated.loop(
+        Animated.sequence([
+          Animated.timing(glowAnim, {
+            toValue: 1,
+            duration: 2000,
+            useNativeDriver: true,
+          }),
+          Animated.timing(glowAnim, {
+            toValue: 0,
+            duration: 2000,
+            useNativeDriver: true,
+          }),
+        ])
+      ),
     ]).start();
-  }, []);
+  };
 
   const loadWalletData = async () => {
     try {
@@ -124,11 +142,7 @@ export default function DashboardScreen() {
     router.push('/rewards');
   };
 
-  const handleKYC = () => {
-    router.push('/kyc');
-  };
-
-  const handleTransactionHistory = () => {
+  const handleTransactions = () => {
     router.push('/transactions');
   };
 
@@ -143,22 +157,6 @@ export default function DashboardScreen() {
 
   const formatAmount = (amount: number, decimals: number = 4) => {
     return amount.toFixed(decimals);
-  };
-
-  const getTransactionIcon = (tx: Transaction) => {
-    if (tx.from_address === walletData?.publicKey) {
-      return 'arrow-up-circle';
-    } else {
-      return 'arrow-down-circle';
-    }
-  };
-
-  const getTransactionColor = (tx: Transaction) => {
-    if (tx.from_address === walletData?.publicKey) {
-      return '#FF006E';
-    } else {
-      return '#00FF88';
-    }
   };
 
   if (loading) {
@@ -190,11 +188,11 @@ export default function DashboardScreen() {
         <View style={styles.header}>
           <View style={styles.headerLeft}>
             <Text style={styles.appName}>SUÉLTALO</Text>
-            <Text style={styles.walletAddress}>{formatAddress(walletData?.publicKey)}</Text>
+            <Text style={styles.tagline}>Tu lana, sin fronteras 🌎</Text>
           </View>
           
-          <TouchableOpacity style={styles.settingsButton} onPress={handleSettings}>
-            <Ionicons name="settings-outline" size={28} color="#FFFFFF" />
+          <TouchableOpacity style={styles.profileButton}>
+            <Text style={styles.addressText}>{formatAddress(walletData?.publicKey)}</Text>
           </TouchableOpacity>
         </View>
       </LinearGradient>
@@ -206,191 +204,201 @@ export default function DashboardScreen() {
         }
         showsVerticalScrollIndicator={false}
       >
-        {/* Neon Balance Cards */}
-        <Animated.View style={[styles.balanceSection, { opacity: fadeAnim, transform: [{ scale: bounceAnim }] }]}>
-          <Text style={styles.sectionTitle}>Tu Feria 💰</Text>
+        {/* Neon Glowing Balance Cards */}
+        <Animated.View style={[styles.balancesSection, { opacity: fadeAnim, transform: [{ scale: bounceAnim }] }]}>
+          <Text style={styles.sectionTitle}>Tu Lana 💰</Text>
           
-          <View style={styles.balanceGrid}>
-            {/* USDC Card - Primary */}
-            <View style={[styles.balanceCard, styles.primaryCard]}>
-              <LinearGradient
-                colors={['rgba(30, 144, 255, 0.2)', 'rgba(255, 0, 110, 0.2)']}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 1 }}
-                style={styles.cardGradient}
-              >
-                <View style={styles.balanceHeader}>
-                  <View style={styles.tokenIconContainer}>
-                    <Ionicons name="wallet" size={32} color="#1E90FF" />
-                  </View>
-                  <Text style={styles.tokenLabel}>USDC</Text>
+          {/* USDC Card - Electric Blue Glow */}
+          <Animated.View style={[styles.neonCard, styles.usdcCard]}>
+            <LinearGradient
+              colors={['rgba(30, 144, 255, 0.3)', 'rgba(30, 144, 255, 0.1)']}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={styles.cardGradient}
+            >
+              <View style={styles.cardHeader}>
+                <View style={styles.cardIcon}>
+                  <Text style={styles.cardEmoji}>💵</Text>
                 </View>
-                <Text style={styles.balanceAmount}>${formatAmount(balances.USDC, 2)}</Text>
-                <Text style={styles.balanceSubtext}>Dólares digitales</Text>
-              </LinearGradient>
-            </View>
+                <Text style={styles.cardTitle}>USDC</Text>
+              </View>
+              <Text style={styles.cardAmount}>${formatAmount(balances.USDC, 2)}</Text>
+              <Text style={styles.cardSubtitle}>Tu lana digital</Text>
+            </LinearGradient>
+          </Animated.View>
 
-            {/* SOL Card */}
-            <View style={styles.balanceCard}>
-              <LinearGradient
-                colors={['rgba(30, 144, 255, 0.15)', 'rgba(30, 144, 255, 0.05)']}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 1 }}
-                style={styles.cardGradient}
-              >
-                <View style={styles.balanceHeader}>
-                  <View style={styles.tokenIconContainer}>
-                    <Ionicons name="flash" size={32} color="#9945FF" />
-                  </View>
-                  <Text style={styles.tokenLabel}>SOL</Text>
+          {/* SLT Card - Neon Magenta Glow */}
+          <Animated.View style={[styles.neonCard, styles.sltCard]}>
+            <LinearGradient
+              colors={['rgba(255, 0, 110, 0.3)', 'rgba(255, 0, 110, 0.1)']}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={styles.cardGradient}
+            >
+              <View style={styles.cardHeader}>
+                <View style={styles.cardIcon}>
+                  <Text style={styles.cardEmoji}>🎁</Text>
                 </View>
-                <Text style={styles.balanceAmount}>{formatAmount(balances.SOL)}</Text>
-                <Text style={styles.balanceSubtext}>Para fees</Text>
-              </LinearGradient>
-            </View>
+                <Text style={styles.cardTitle}>SLT</Text>
+              </View>
+              <Text style={styles.cardAmount}>{formatAmount(balances.SLT)}</Text>
+              <Text style={styles.cardSubtitle}>Premios ganados</Text>
+            </LinearGradient>
+          </Animated.View>
 
-            {/* SLT Rewards Card */}
-            <View style={styles.balanceCard}>
-              <LinearGradient
-                colors={['rgba(0, 255, 136, 0.15)', 'rgba(0, 255, 136, 0.05)']}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 1 }}
-                style={styles.cardGradient}
-              >
-                <View style={styles.balanceHeader}>
-                  <View style={styles.tokenIconContainer}>
-                    <Ionicons name="gift" size={32} color="#00FF88" />
-                  </View>
-                  <Text style={styles.tokenLabel}>SLT</Text>
+          {/* SOL Card - Neon Green Glow */}
+          <Animated.View style={[styles.neonCard, styles.solCard]}>
+            <LinearGradient
+              colors={['rgba(0, 255, 136, 0.3)', 'rgba(0, 255, 136, 0.1)']}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={styles.cardGradient}
+            >
+              <View style={styles.cardHeader}>
+                <View style={styles.cardIcon}>
+                  <Text style={styles.cardEmoji}>⚡</Text>
                 </View>
-                <Text style={styles.balanceAmount}>{formatAmount(balances.SLT)}</Text>
-                <Text style={styles.balanceSubtext}>Premios ganados</Text>
-              </LinearGradient>
-            </View>
-          </View>
+                <Text style={styles.cardTitle}>SOL</Text>
+              </View>
+              <Text style={styles.cardAmount}>{formatAmount(balances.SOL)}</Text>
+              <Text style={styles.cardSubtitle}>Para los fees</Text>
+            </LinearGradient>
+          </Animated.View>
         </Animated.View>
 
-        {/* Urban Action Buttons */}
-        <Animated.View style={[styles.actionSection, { opacity: fadeAnim }]}>
-          <TouchableOpacity style={styles.actionButton} onPress={handleSend}>
+        {/* Big Neon Action Buttons */}
+        <Animated.View style={[styles.actionsSection, { opacity: fadeAnim }]}>
+          <TouchableOpacity style={styles.bigActionButton} onPress={handleSend}>
+            <LinearGradient
+              colors={['#1E90FF', '#00BFFF']}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={styles.bigButtonGradient}
+            >
+              <Text style={styles.bigButtonEmoji}>💸</Text>
+              <Text style={styles.bigButtonText}>Enviar</Text>
+              <Text style={styles.bigButtonSubtext}>Manda lana al toque</Text>
+            </LinearGradient>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.bigActionButton} onPress={handleReceive}>
             <LinearGradient
               colors={['#FF006E', '#FF4081']}
-              style={styles.actionGradient}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={styles.bigButtonGradient}
             >
-              <Ionicons name="arrow-up" size={28} color="#FFFFFF" />
+              <Text style={styles.bigButtonEmoji}>📥</Text>
+              <Text style={styles.bigButtonText}>Recibir</Text>
+              <Text style={styles.bigButtonSubtext}>Cobra sin broncas</Text>
             </LinearGradient>
-            <Text style={styles.actionButtonText}>Mandar</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.actionButton} onPress={handleReceive}>
+          <TouchableOpacity style={styles.bigActionButton} onPress={handleRewards}>
             <LinearGradient
-              colors={['#00FF88', '#00E676']}
-              style={styles.actionGradient}
+              colors={['#00FF88', '#4CAF50']}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={styles.bigButtonGradient}
             >
-              <Ionicons name="arrow-down" size={28} color="#FFFFFF" />
+              <Text style={styles.bigButtonEmoji}>🎉</Text>
+              <Text style={styles.bigButtonText}>Rewards</Text>
+              <Text style={styles.bigButtonSubtext}>Gana premios SLT</Text>
             </LinearGradient>
-            <Text style={styles.actionButtonText}>Cobrar</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.actionButton} onPress={handleRewards}>
-            <LinearGradient
-              colors={['#1E90FF', '#2196F3']}
-              style={styles.actionGradient}
-            >
-              <Ionicons name="gift" size={28} color="#FFFFFF" />
-            </LinearGradient>
-            <Text style={styles.actionButtonText}>Premios</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.actionButton} onPress={handleKYC}>
-            <LinearGradient
-              colors={['#FF6B35', '#FF8A65']}
-              style={styles.actionGradient}
-            >
-              <Ionicons name="shield-checkmark" size={28} color="#FFFFFF" />
-            </LinearGradient>
-            <Text style={styles.actionButtonText}>Verificar</Text>
           </TouchableOpacity>
         </Animated.View>
 
-        {/* Neon Ledger Transactions */}
-        <Animated.View style={[styles.transactionSection, { opacity: fadeAnim }]}>
-          <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>Movimientos Recientes</Text>
-            <TouchableOpacity onPress={handleTransactionHistory}>
-              <Text style={styles.viewAllText}>Ver todo</Text>
-            </TouchableOpacity>
-          </View>
-
-          {transactions.length === 0 ? (
-            <View style={styles.emptyState}>
-              <View style={styles.emptyIconContainer}>
-                <Ionicons name="receipt-outline" size={64} color="#AAAAAA" />
-              </View>
-              <Text style={styles.emptyStateText}>¡Órale! No hay movimientos aún</Text>
-              <Text style={styles.emptyStateSubtext}>Cuando mandes o recibas lana, aquí aparecerá</Text>
+        {/* Recent Activity */}
+        {transactions.length > 0 && (
+          <Animated.View style={[styles.activitySection, { opacity: fadeAnim }]}>
+            <View style={styles.activityHeader}>
+              <Text style={styles.sectionTitle}>Movimientos Recientes</Text>
+              <TouchableOpacity onPress={handleTransactions}>
+                <Text style={styles.viewAllText}>Ver todo</Text>
+              </TouchableOpacity>
             </View>
-          ) : (
-            <View style={styles.transactionList}>
-              {transactions.map((tx, index) => (
-                <Animated.View 
-                  key={tx.id} 
-                  style={[
-                    styles.transactionItem,
-                    { 
-                      opacity: fadeAnim,
-                      transform: [{ 
-                        translateY: fadeAnim.interpolate({
-                          inputRange: [0, 1],
-                          outputRange: [50 * (index + 1), 0]
-                        })
-                      }]
-                    }
-                  ]}
-                >
-                  <LinearGradient
-                    colors={['rgba(30, 144, 255, 0.05)', 'rgba(255, 0, 110, 0.05)']}
-                    start={{ x: 0, y: 0 }}
-                    end={{ x: 1, y: 0 }}
-                    style={styles.transactionGradient}
-                  >
-                    <View style={styles.transactionLeft}>
-                      <View style={[styles.transactionIconContainer, { borderColor: getTransactionColor(tx) }]}>
-                        <Ionicons 
-                          name={getTransactionIcon(tx)} 
-                          size={24} 
-                          color={getTransactionColor(tx)} 
-                        />
-                      </View>
-                      <View style={styles.transactionDetails}>
-                        <Text style={styles.transactionType}>
-                          {tx.from_address === walletData?.publicKey ? 'Mandaste' : 'Te llegó'} {tx.token_type}
-                        </Text>
-                        <Text style={styles.transactionAddress}>
-                          {tx.from_address === walletData?.publicKey 
-                            ? `Para: ${formatAddress(tx.to_address)}`
-                            : `De: ${formatAddress(tx.from_address)}`
-                          }
-                        </Text>
-                      </View>
-                    </View>
-                    
-                    <View style={styles.transactionRight}>
-                      <Text style={[styles.transactionAmount, { color: getTransactionColor(tx) }]}>
-                        {tx.from_address === walletData?.publicKey ? '-' : '+'}
-                        {formatAmount(tx.amount)} {tx.token_type}
-                      </Text>
-                      {tx.reward_slt > 0 && (
-                        <Text style={styles.rewardText}>+{formatAmount(tx.reward_slt)} SLT 🎁</Text>
-                      )}
-                    </View>
-                  </LinearGradient>
-                </Animated.View>
+            
+            <View style={styles.quickActivity}>
+              {transactions.slice(0, 3).map((tx, index) => (
+                <View key={tx.id} style={styles.activityItem}>
+                  <View style={styles.activityIcon}>
+                    <Ionicons 
+                      name={tx.from_address === walletData?.publicKey ? 'arrow-up-circle' : 'arrow-down-circle'} 
+                      size={20} 
+                      color={tx.from_address === walletData?.publicKey ? '#FF006E' : '#00FF88'} 
+                    />
+                  </View>
+                  <View style={styles.activityDetails}>
+                    <Text style={styles.activityType}>
+                      {tx.from_address === walletData?.publicKey ? 'Mandaste' : 'Te llegó'} {tx.token_type}
+                    </Text>
+                    <Text style={styles.activityAmount}>
+                      {tx.from_address === walletData?.publicKey ? '-' : '+'}
+                      {formatAmount(tx.amount)} {tx.token_type}
+                    </Text>
+                  </View>
+                </View>
               ))}
             </View>
-          )}
-        </Animated.View>
+          </Animated.View>
+        )}
       </ScrollView>
+
+      {/* Bottom Navigation with Neon Icons */}
+      <View style={styles.bottomNav}>
+        <LinearGradient
+          colors={['rgba(12, 12, 12, 0.95)', 'rgba(30, 30, 30, 0.95)']}
+          style={styles.bottomNavGradient}
+        >
+          <TouchableOpacity 
+            style={[styles.navButton, activeTab === 'inicio' && styles.activeNavButton]} 
+            onPress={() => setActiveTab('inicio')}
+          >
+            <Ionicons 
+              name="home" 
+              size={24} 
+              color={activeTab === 'inicio' ? '#1E90FF' : '#666666'} 
+            />
+            <Text style={[styles.navText, activeTab === 'inicio' && styles.activeNavText]}>
+              Inicio
+            </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity 
+            style={[styles.navButton, activeTab === 'historial' && styles.activeNavButton]} 
+            onPress={() => {
+              setActiveTab('historial');
+              handleTransactions();
+            }}
+          >
+            <Ionicons 
+              name="list" 
+              size={24} 
+              color={activeTab === 'historial' ? '#FF006E' : '#666666'} 
+            />
+            <Text style={[styles.navText, activeTab === 'historial' && styles.activeNavText]}>
+              Historial
+            </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity 
+            style={[styles.navButton, activeTab === 'config' && styles.activeNavButton]} 
+            onPress={() => {
+              setActiveTab('config');
+              handleSettings();
+            }}
+          >
+            <Ionicons 
+              name="settings" 
+              size={24} 
+              color={activeTab === 'config' ? '#00FF88' : '#666666'} 
+            />
+            <Text style={[styles.navText, activeTab === 'config' && styles.activeNavText]}>
+              Config
+            </Text>
+          </TouchableOpacity>
+        </LinearGradient>
+      </View>
     </SafeAreaView>
   );
 }
@@ -429,222 +437,231 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   appName: {
-    fontSize: 28,
+    fontSize: 32,
     fontWeight: '900',
     color: '#FFFFFF',
-    letterSpacing: 2,
+    letterSpacing: 3,
     textShadowColor: '#000000',
-    textShadowOffset: { width: 1, height: 1 },
-    textShadowRadius: 2,
+    textShadowOffset: { width: 2, height: 2 },
+    textShadowRadius: 4,
   },
-  walletAddress: {
+  tagline: {
     fontSize: 14,
     color: '#AAAAAA',
-    fontFamily: 'monospace',
     marginTop: 4,
     letterSpacing: 1,
   },
-  settingsButton: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
+  profileButton: {
     backgroundColor: 'rgba(255, 255, 255, 0.1)',
-    justifyContent: 'center',
-    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 20,
+  },
+  addressText: {
+    color: '#FFFFFF',
+    fontSize: 12,
+    fontFamily: 'monospace',
+    fontWeight: '600',
   },
   scrollContainer: {
     flex: 1,
+    paddingBottom: 90, // Space for bottom nav
   },
-  balanceSection: {
+  balancesSection: {
     padding: 20,
   },
   sectionTitle: {
-    fontSize: 24,
-    fontWeight: '800',
+    fontSize: 28,
+    fontWeight: '900',
     color: '#FFFFFF',
-    marginBottom: 20,
+    marginBottom: 24,
     letterSpacing: 1,
+    textAlign: 'center',
   },
-  balanceGrid: {
-    gap: 16,
-  },
-  balanceCard: {
-    borderRadius: 20,
-    overflow: 'hidden',
-    borderWidth: 1,
-    borderColor: 'rgba(30, 144, 255, 0.3)',
-  },
-  primaryCard: {
-    borderColor: '#1E90FF',
-    shadowColor: '#1E90FF',
+  neonCard: {
+    borderRadius: 24,
+    marginBottom: 20,
     shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.3,
-    shadowRadius: 10,
-    elevation: 10,
+    shadowOpacity: 0.6,
+    shadowRadius: 20,
+    elevation: 20,
+  },
+  usdcCard: {
+    shadowColor: '#1E90FF',
+    borderWidth: 2,
+    borderColor: '#1E90FF',
+  },
+  sltCard: {
+    shadowColor: '#FF006E',
+    borderWidth: 2,
+    borderColor: '#FF006E',
+  },
+  solCard: {
+    shadowColor: '#00FF88',
+    borderWidth: 2,
+    borderColor: '#00FF88',
   },
   cardGradient: {
-    padding: 24,
+    padding: 28,
+    borderRadius: 22,
   },
-  balanceHeader: {
+  cardHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
     marginBottom: 16,
   },
-  tokenIconContainer: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    backgroundColor: 'rgba(30, 144, 255, 0.1)',
+  cardIcon: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
     justifyContent: 'center',
     alignItems: 'center',
+    marginRight: 16,
   },
-  tokenLabel: {
-    fontSize: 18,
-    fontWeight: '800',
+  cardEmoji: {
+    fontSize: 24,
+  },
+  cardTitle: {
+    fontSize: 24,
+    fontWeight: '900',
     color: '#FFFFFF',
-    letterSpacing: 1,
+    letterSpacing: 2,
   },
-  balanceAmount: {
-    fontSize: 36,
+  cardAmount: {
+    fontSize: 42,
     fontWeight: '900',
     color: '#FFFFFF',
     marginBottom: 8,
     letterSpacing: 1,
+    textAlign: 'center',
   },
-  balanceSubtext: {
-    fontSize: 14,
+  cardSubtitle: {
+    fontSize: 16,
     color: '#AAAAAA',
+    textAlign: 'center',
     letterSpacing: 0.5,
+    fontWeight: '600',
   },
-  actionSection: {
-    flexDirection: 'row',
+  actionsSection: {
     paddingHorizontal: 20,
-    gap: 15,
+    gap: 16,
     marginBottom: 30,
   },
-  actionButton: {
-    flex: 1,
-    alignItems: 'center',
-    paddingVertical: 16,
-  },
-  actionGradient: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 12,
+  bigActionButton: {
+    borderRadius: 20,
+    overflow: 'hidden',
     shadowColor: '#1E90FF',
-    shadowOffset: { width: 0, height: 4 },
+    shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 8,
+    shadowRadius: 16,
+    elevation: 16,
   },
-  actionButtonText: {
-    color: '#FFFFFF',
-    fontSize: 14,
-    fontWeight: '700',
-    letterSpacing: 0.5,
-  },
-  transactionSection: {
-    paddingHorizontal: 20,
-    paddingBottom: 30,
-  },
-  sectionHeader: {
-    flexDirection: 'row',
+  bigButtonGradient: {
+    paddingVertical: 24,
+    paddingHorizontal: 28,
     alignItems: 'center',
+    flexDirection: 'row',
+  },
+  bigButtonEmoji: {
+    fontSize: 32,
+    marginRight: 20,
+  },
+  bigButtonText: {
+    fontSize: 22,
+    fontWeight: '800',
+    color: '#FFFFFF',
+    letterSpacing: 1,
+    flex: 1,
+  },
+  bigButtonSubtext: {
+    fontSize: 12,
+    color: 'rgba(255, 255, 255, 0.8)',
+    fontWeight: '600',
+  },
+  activitySection: {
+    paddingHorizontal: 20,
+    marginBottom: 30,
+  },
+  activityHeader: {
+    flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: 20,
+    alignItems: 'center',
+    marginBottom: 16,
   },
   viewAllText: {
     color: '#1E90FF',
-    fontSize: 16,
-    fontWeight: '700',
-    letterSpacing: 0.5,
-  },
-  emptyState: {
-    alignItems: 'center',
-    paddingVertical: 50,
-  },
-  emptyIconContainer: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-    backgroundColor: 'rgba(170, 170, 170, 0.1)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 20,
-  },
-  emptyStateText: {
-    color: '#AAAAAA',
-    fontSize: 18,
-    fontWeight: '600',
-    marginBottom: 8,
-  },
-  emptyStateSubtext: {
-    color: '#666666',
     fontSize: 14,
-    textAlign: 'center',
-    paddingHorizontal: 20,
-    lineHeight: 20,
+    fontWeight: '700',
   },
-  transactionList: {
-    gap: 12,
-  },
-  transactionItem: {
+  quickActivity: {
+    backgroundColor: 'rgba(255, 255, 255, 0.05)',
     borderRadius: 16,
-    overflow: 'hidden',
-    borderWidth: 1,
-    borderColor: 'rgba(30, 144, 255, 0.2)',
+    padding: 16,
   },
-  transactionGradient: {
-    padding: 20,
+  activityItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(255, 255, 255, 0.1)',
   },
-  transactionLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    flex: 1,
-  },
-  transactionIconContainer: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    backgroundColor: 'rgba(30, 144, 255, 0.1)',
+  activityIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
     justifyContent: 'center',
     alignItems: 'center',
-    borderWidth: 2,
-    marginRight: 16,
+    marginRight: 12,
   },
-  transactionDetails: {
+  activityDetails: {
     flex: 1,
   },
-  transactionType: {
+  activityType: {
     color: '#FFFFFF',
-    fontSize: 16,
-    fontWeight: '700',
-    marginBottom: 4,
+    fontSize: 14,
+    fontWeight: '600',
+    marginBottom: 2,
   },
-  transactionAddress: {
+  activityAmount: {
     color: '#AAAAAA',
     fontSize: 12,
-    fontFamily: 'monospace',
+    fontWeight: '500',
   },
-  transactionRight: {
-    alignItems: 'flex-end',
+  bottomNav: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    height: 90,
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(255, 255, 255, 0.1)',
   },
-  transactionAmount: {
-    fontSize: 16,
-    fontWeight: '800',
-    letterSpacing: 0.5,
+  bottomNavGradient: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-around',
+    paddingBottom: 20,
+    paddingTop: 16,
   },
-  rewardText: {
-    color: '#00FF88',
+  navButton: {
+    alignItems: 'center',
+    paddingVertical: 8,
+    paddingHorizontal: 20,
+    borderRadius: 16,
+  },
+  activeNavButton: {
+    backgroundColor: 'rgba(30, 144, 255, 0.1)',
+  },
+  navText: {
     fontSize: 12,
     fontWeight: '600',
     marginTop: 4,
+    color: '#666666',
+  },
+  activeNavText: {
+    color: '#FFFFFF',
   },
 });
