@@ -14,9 +14,9 @@ import {
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
 import { WalletService } from '../services/WalletService';
 import { ApiService } from '../services/ApiService';
+import { ErrorBoundary } from '../components/ErrorBoundary';
 
 const { width } = Dimensions.get('window');
 
