@@ -663,4 +663,11 @@ const styles = StyleSheet.create({
   activeNavText: {
     color: '#FFFFFF',
   },
+  navIcon: {
+    fontSize: 20,
+    marginBottom: 4,
+  },
+  activityEmoji: {
+    fontSize: 18,
+  },
 });
