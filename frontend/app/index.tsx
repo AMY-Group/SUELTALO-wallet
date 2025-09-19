@@ -172,7 +172,7 @@ export default function WelcomeScreen() {
                   colors={['transparent', 'transparent']}
                   style={styles.secondaryGradient}
                 >
-                  <Ionicons name="download" size={24} color="#1E90FF" style={styles.buttonIcon} />
+                  <Text style={styles.secondaryButtonIcon}>📱</Text>
                   <Text style={styles.secondaryButtonText}>Ya tengo una</Text>
                 </LinearGradient>
               </TouchableOpacity>
