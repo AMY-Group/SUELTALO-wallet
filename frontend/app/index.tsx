@@ -159,7 +159,7 @@ export default function WelcomeScreen() {
                   end={{ x: 1, y: 0 }}
                   style={styles.gradientButton}
                 >
-                  <Ionicons name="add-circle" size={24} color="#FFFFFF" style={styles.buttonIcon} />
+                  <Text style={styles.buttonIcon}>➕</Text>
                   <Text style={styles.primaryButtonText}>Crear mi billetera</Text>
                 </LinearGradient>
               </TouchableOpacity>
