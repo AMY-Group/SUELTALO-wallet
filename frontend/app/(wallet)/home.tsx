@@ -209,25 +209,7 @@ export default function DashboardScreen() {
             }
             showsVerticalScrollIndicator={false}
           >
-            {/* DEBUG BLOCK */}
-            <View style={styles.debugBlock}>
-              <Text style={styles.debugText}>SUÉLTALO • Dashboard activo</Text>
-            </View>
-
-            {/* DEBUG NEON CARD PLACEHOLDERS */}
-            <View style={styles.debugCardsContainer}>
-              <View style={[styles.debugCard, styles.debugCardUsdc]}>
-                <Text style={styles.debugCardLabel}>USDC</Text>
-              </View>
-              <View style={[styles.debugCard, styles.debugCardSlt]}>
-                <Text style={styles.debugCardLabel}>SLT</Text>
-              </View>
-              <View style={[styles.debugCard, styles.debugCardSol]}>
-                <Text style={styles.debugCardLabel}>SOL</Text>
-              </View>
-            </View>
-
-            {/* ORIGINAL CONTENT - NEON GLOWING BALANCE CARDS */}
+            {/* NEON GLOWING BALANCE CARDS */}
             <Animated.View style={[styles.balancesSection, { opacity: fadeAnim, transform: [{ scale: bounceAnim }] }]}>
               <Text style={styles.sectionTitle}>Tu Lana 💰</Text>
               
