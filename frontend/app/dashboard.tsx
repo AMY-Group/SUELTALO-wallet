@@ -11,8 +11,8 @@ import {
   StatusBar,
   Dimensions,
   Animated,
-  LinearGradient
 } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { WalletService } from '../services/WalletService';
