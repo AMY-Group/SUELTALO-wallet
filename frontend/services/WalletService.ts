@@ -215,7 +215,7 @@ export class WalletService {
   static async clearWallet(): Promise<void> {
     try {
       await AsyncStorage.removeItem(this.WALLET_KEY);
-      await SecureStore.deleteItemAsync(this.SEED_PHRASE_KEY);
+      await this.deleteSecureItem(this.SEED_PHRASE_KEY);
     } catch (error) {
       console.error('Failed to clear wallet:', error);
       throw error;
