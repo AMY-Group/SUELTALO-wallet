@@ -19,18 +19,72 @@ const { width, height } = Dimensions.get('window');
 
 export default function OnboardingCTAScreen() {
   const router = useRouter();
+  const [isCreating, setIsCreating] = useState(false);
+
+  const generateWallet = async () => {
+    try {
+      setIsCreating(true);
+      
+      // Generate mnemonic phrase
+      const mnemonic = bip39.generateMnemonic();
+      
+      // Generate keypair from mnemonic
+      const seed = await bip39.mnemonicToSeed(mnemonic);
+      const keypair = Keypair.fromSeed(seed.slice(0, 32));
+      
+      // Store in SecureStore
+      await SecureStore.setItemAsync('secret', mnemonic);
+      await SecureStore.setItemAsync('publicKey', keypair.publicKey.toBase58());
+      
+      console.log('Wallet created successfully');
+      Alert.alert(
+        '¡Wallet creada! 🎉',
+        'Tu billetera fue creada exitosamente. ¡Ya podés empezar a usar SUÉLTALO!',
+        [
+          {
+            text: '¡Dale!',
+            onPress: () => router.replace('/(wallet)/home')
+          }
+        ]
+      );
+    } catch (error) {
+      console.error('Error creating wallet:', error);
+      Alert.alert(
+        'Error',
+        'No pudimos crear tu billetera. Intentá de nuevo.',
+        [{ text: 'OK' }]
+      );
+    } finally {
+      setIsCreating(false);
+    }
+  };
 
   const handleCreateWallet = () => {
-    router.push('/(onboarding)/create');
+    generateWallet();
   };
 
   const handleImportWallet = () => {
-    router.push('/(onboarding)/import');
+    // Navigate to import wallet flow (to be implemented)
+    Alert.alert(
+      'Importar billetera',
+      'Esta función estará disponible pronto. Por ahora, creá una nueva billetera.',
+      [{ text: 'OK' }]
+    );
   };
 
   const handleSkip = () => {
-    // Navigate to dashboard or main app without wallet
-    router.push('/');
+    // Direct redirect to wallet home without wallet (demo mode)
+    Alert.alert(
+      'Modo Demo',
+      'Vas a entrar en modo demo sin billetera. Podés crear una después.',
+      [
+        { text: 'Cancelar', style: 'cancel' },
+        {
+          text: 'Continuar',
+          onPress: () => router.replace('/(wallet)/home')
+        }
+      ]
+    );
   };
 
   return (
