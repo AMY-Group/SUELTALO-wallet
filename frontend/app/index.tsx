@@ -7,7 +7,8 @@ import {
   TouchableOpacity, 
   StatusBar,
   Dimensions,
-  ImageBackground
+  Animated,
+  LinearGradient
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -19,9 +20,26 @@ export default function WelcomeScreen() {
   const router = useRouter();
   const [hasWallet, setHasWallet] = useState(false);
   const [loading, setLoading] = useState(true);
+  const fadeAnim = new Animated.Value(0);
+  const scaleAnim = new Animated.Value(0.8);
 
   useEffect(() => {
     checkExistingWallet();
+    
+    // Start animations
+    Animated.parallel([
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 1000,
+        useNativeDriver: true,
+      }),
+      Animated.spring(scaleAnim, {
+        toValue: 1,
+        tension: 80,
+        friction: 8,
+        useNativeDriver: true,
+      }),
+    ]).start();
   }, []);
 
   const checkExistingWallet = async () => {
@@ -59,51 +77,76 @@ export default function WelcomeScreen() {
   if (loading) {
     return (
       <SafeAreaView style={styles.loadingContainer}>
-        <View style={styles.loadingContent}>
-          <Text style={styles.loadingText}>SUÉLTALO</Text>
-          <Text style={styles.loadingSubtext}>Loading...</Text>
-        </View>
+        <LinearGradient
+          colors={['#1E90FF', '#FF006E']}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={styles.gradientOverlay}
+        >
+          <View style={styles.loadingContent}>
+            <Text style={styles.loadingText}>SUÉLTALO</Text>
+            <Text style={styles.loadingSubtext}>Cargando...</Text>
+          </View>
+        </LinearGradient>
       </SafeAreaView>
     );
   }
 
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor="#0a0a0a" />
+      <StatusBar barStyle="light-content" backgroundColor="#0C0C0C" />
       
-      <View style={styles.header}>
-        <Text style={styles.appName}>SUÉLTALO</Text>
-        <Text style={styles.tagline}>Non-Custodial Crypto Wallet</Text>
-        <View style={styles.badge}>
-          <Text style={styles.badgeText}>SOLANA DEVNET</Text>
-        </View>
-      </View>
+      {/* Gradient Header */}
+      <LinearGradient
+        colors={['#1E90FF', '#FF006E']}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={styles.gradientHeader}
+      >
+        <Animated.View style={[styles.headerContent, { opacity: fadeAnim }]}>
+          <Text style={styles.appName}>SUÉLTALO</Text>
+          <Text style={styles.tagline}>Billetera Cripto No-Custodial</Text>
+          <View style={styles.badge}>
+            <Text style={styles.badgeText}>SOLANA DEVNET</Text>
+          </View>
+        </Animated.View>
+      </LinearGradient>
 
-      <View style={styles.iconContainer}>
-        <View style={styles.iconCircle}>
-          <Ionicons name="wallet" size={60} color="#00D4FF" />
+      <Animated.View style={[styles.content, { opacity: fadeAnim, transform: [{ scale: scaleAnim }] }]}>
+        {/* Neon Wallet Icon */}
+        <View style={styles.iconContainer}>
+          <View style={styles.neonIconCircle}>
+            <View style={styles.innerGlow}>
+              <Ionicons name="wallet" size={80} color="#00FF88" />
+            </View>
+          </View>
         </View>
-      </View>
 
-      <View style={styles.content}>
         <Text style={styles.title}>
-          {hasWallet ? 'Welcome Back!' : 'Get Started'}
+          {hasWallet ? '¡Bienvenido de Vuelta!' : 'Comenzar'}
         </Text>
         <Text style={styles.subtitle}>
           {hasWallet 
-            ? 'Access your non-custodial Solana wallet'
-            : 'Create or import your non-custodial Solana wallet'
+            ? 'Accede a tu billetera Solana no-custodial'
+            : 'Crea o importa tu billetera Solana no-custodial'
           }
         </Text>
 
         <View style={styles.buttonContainer}>
           {hasWallet ? (
             <TouchableOpacity 
-              style={[styles.primaryButton, styles.accessButton]} 
+              style={styles.accessButton} 
               onPress={handleAccessWallet}
             >
-              <Ionicons name="arrow-forward" size={20} color="#0a0a0a" style={styles.buttonIcon} />
-              <Text style={styles.primaryButtonText}>Access Wallet</Text>
+              <LinearGradient
+                colors={['#1E90FF', '#FF006E']}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 0 }}
+                style={styles.gradientButton}
+              >
+                <Ionicons name="arrow-forward" size={24} color="#FFFFFF" style={styles.buttonIcon} />
+                <Text style={styles.primaryButtonText}>Acceder Billetera</Text>
+              </LinearGradient>
             </TouchableOpacity>
           ) : (
             <>
@@ -111,36 +154,58 @@ export default function WelcomeScreen() {
                 style={styles.primaryButton} 
                 onPress={handleCreateWallet}
               >
-                <Ionicons name="add-circle" size={20} color="#0a0a0a" style={styles.buttonIcon} />
-                <Text style={styles.primaryButtonText}>Create New Wallet</Text>
+                <LinearGradient
+                  colors={['#1E90FF', '#FF006E']}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 0 }}
+                  style={styles.gradientButton}
+                >
+                  <Ionicons name="add-circle" size={24} color="#FFFFFF" style={styles.buttonIcon} />
+                  <Text style={styles.primaryButtonText}>Nueva Billetera</Text>
+                </LinearGradient>
               </TouchableOpacity>
 
               <TouchableOpacity 
                 style={styles.secondaryButton} 
                 onPress={handleImportWallet}
               >
-                <Ionicons name="download" size={20} color="#00D4FF" style={styles.buttonIcon} />
-                <Text style={styles.secondaryButtonText}>Import Existing Wallet</Text>
+                <LinearGradient
+                  colors={['transparent', 'transparent']}
+                  style={styles.secondaryGradient}
+                >
+                  <Ionicons name="download" size={24} color="#1E90FF" style={styles.buttonIcon} />
+                  <Text style={styles.secondaryButtonText}>Importar Billetera</Text>
+                </LinearGradient>
               </TouchableOpacity>
             </>
           )}
         </View>
 
+        {/* Street-Style Features */}
         <View style={styles.features}>
           <View style={styles.feature}>
-            <Ionicons name="shield-checkmark" size={24} color="#00D4FF" />
-            <Text style={styles.featureText}>Non-Custodial</Text>
+            <View style={styles.featureIcon}>
+              <Ionicons name="shield-checkmark" size={28} color="#00FF88" />
+            </View>
+            <Text style={styles.featureText}>No-Custodial</Text>
+            <Text style={styles.featureSubtext}>Tu Control</Text>
           </View>
           <View style={styles.feature}>
-            <Ionicons name="flash" size={24} color="#00D4FF" />
-            <Text style={styles.featureText}>Fast Transfers</Text>
+            <View style={styles.featureIcon}>
+              <Ionicons name="flash" size={28} color="#1E90FF" />
+            </View>
+            <Text style={styles.featureText}>Rápido</Text>
+            <Text style={styles.featureSubtext}>Transferencias</Text>
           </View>
           <View style={styles.feature}>
-            <Ionicons name="gift" size={24} color="#00D4FF" />
-            <Text style={styles.featureText}>SLT Rewards</Text>
+            <View style={styles.featureIcon}>
+              <Ionicons name="gift" size={28} color="#FF006E" />
+            </View>
+            <Text style={styles.featureText}>Recompensas</Text>
+            <Text style={styles.featureSubtext}>SLT Tokens</Text>
           </View>
         </View>
-      </View>
+      </Animated.View>
     </SafeAreaView>
   );
 }
@@ -148,11 +213,14 @@ export default function WelcomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0a0a0a',
+    backgroundColor: '#0C0C0C',
   },
   loadingContainer: {
     flex: 1,
-    backgroundColor: '#0a0a0a',
+    backgroundColor: '#0C0C0C',
+  },
+  gradientOverlay: {
+    flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -160,135 +228,188 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   loadingText: {
-    fontSize: 32,
-    fontWeight: '800',
-    color: '#00D4FF',
-    letterSpacing: 2,
+    fontSize: 42,
+    fontWeight: '900',
+    color: '#FFFFFF',
+    letterSpacing: 4,
+    textShadowColor: '#1E90FF',
+    textShadowOffset: { width: 0, height: 0 },
+    textShadowRadius: 10,
   },
   loadingSubtext: {
-    fontSize: 16,
-    color: '#666',
-    marginTop: 8,
+    fontSize: 18,
+    color: '#AAAAAA',
+    marginTop: 12,
+    letterSpacing: 2,
   },
-  header: {
+  gradientHeader: {
+    paddingTop: 60,
+    paddingBottom: 40,
+    paddingHorizontal: 24,
+  },
+  headerContent: {
     alignItems: 'center',
-    paddingTop: 40,
-    paddingBottom: 20,
   },
   appName: {
-    fontSize: 36,
-    fontWeight: '800',
-    color: '#00D4FF',
-    letterSpacing: 3,
+    fontSize: 48,
+    fontWeight: '900',
+    color: '#FFFFFF',
+    letterSpacing: 6,
+    textShadowColor: '#000000',
+    textShadowOffset: { width: 2, height: 2 },
+    textShadowRadius: 4,
   },
   tagline: {
-    fontSize: 14,
-    color: '#888',
-    marginTop: 4,
-    letterSpacing: 1,
+    fontSize: 16,
+    color: '#AAAAAA',
+    marginTop: 8,
+    letterSpacing: 2,
+    textTransform: 'uppercase',
   },
   badge: {
-    backgroundColor: '#1a1a1a',
-    paddingHorizontal: 12,
-    paddingVertical: 4,
-    borderRadius: 12,
-    marginTop: 12,
+    backgroundColor: 'rgba(0, 0, 0, 0.3)',
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 16,
+    marginTop: 16,
     borderWidth: 1,
-    borderColor: '#333',
+    borderColor: '#00FF88',
   },
   badgeText: {
-    fontSize: 10,
-    color: '#00D4FF',
-    fontWeight: '600',
-    letterSpacing: 1,
-  },
-  iconContainer: {
-    alignItems: 'center',
-    marginVertical: 40,
-  },
-  iconCircle: {
-    width: 120,
-    height: 120,
-    borderRadius: 60,
-    backgroundColor: '#1a1a1a',
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderWidth: 2,
-    borderColor: '#00D4FF',
+    fontSize: 12,
+    color: '#00FF88',
+    fontWeight: '700',
+    letterSpacing: 1.5,
   },
   content: {
     flex: 1,
     paddingHorizontal: 24,
     alignItems: 'center',
+    paddingTop: 40,
+  },
+  iconContainer: {
+    alignItems: 'center',
+    marginBottom: 40,
+  },
+  neonIconCircle: {
+    width: 160,
+    height: 160,
+    borderRadius: 80,
+    backgroundColor: '#0C0C0C',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 3,
+    borderColor: '#00FF88',
+    shadowColor: '#00FF88',
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.8,
+    shadowRadius: 20,
+    elevation: 20,
+  },
+  innerGlow: {
+    width: 140,
+    height: 140,
+    borderRadius: 70,
+    backgroundColor: 'rgba(0, 255, 136, 0.1)',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   title: {
-    fontSize: 28,
-    fontWeight: '700',
-    color: '#fff',
+    fontSize: 32,
+    fontWeight: '800',
+    color: '#FFFFFF',
     textAlign: 'center',
-    marginBottom: 8,
+    marginBottom: 12,
+    letterSpacing: 1,
   },
   subtitle: {
-    fontSize: 16,
-    color: '#888',
+    fontSize: 18,
+    color: '#AAAAAA',
     textAlign: 'center',
-    marginBottom: 40,
-    lineHeight: 22,
+    marginBottom: 50,
+    lineHeight: 26,
+    paddingHorizontal: 20,
   },
   buttonContainer: {
     width: '100%',
-    gap: 16,
+    gap: 20,
   },
   primaryButton: {
-    backgroundColor: '#00D4FF',
-    paddingVertical: 16,
-    paddingHorizontal: 24,
-    borderRadius: 12,
+    borderRadius: 16,
+    overflow: 'hidden',
+  },
+  accessButton: {
+    borderRadius: 16,
+    overflow: 'hidden',
+  },
+  gradientButton: {
+    paddingVertical: 20,
+    paddingHorizontal: 32,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
   },
-  accessButton: {
-    backgroundColor: '#00D4FF',
-  },
   primaryButtonText: {
-    color: '#0a0a0a',
-    fontSize: 16,
-    fontWeight: '600',
+    color: '#FFFFFF',
+    fontSize: 18,
+    fontWeight: '700',
+    letterSpacing: 1,
   },
   secondaryButton: {
-    backgroundColor: 'transparent',
-    paddingVertical: 16,
-    paddingHorizontal: 24,
-    borderRadius: 12,
+    borderRadius: 16,
     borderWidth: 2,
-    borderColor: '#00D4FF',
+    borderColor: '#1E90FF',
+    overflow: 'hidden',
+  },
+  secondaryGradient: {
+    paddingVertical: 20,
+    paddingHorizontal: 32,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
   },
   secondaryButtonText: {
-    color: '#00D4FF',
-    fontSize: 16,
-    fontWeight: '600',
+    color: '#1E90FF',
+    fontSize: 18,
+    fontWeight: '700',
+    letterSpacing: 1,
   },
   buttonIcon: {
-    marginRight: 8,
+    marginRight: 12,
   },
   features: {
     flexDirection: 'row',
     justifyContent: 'space-around',
     width: '100%',
-    marginTop: 40,
-    paddingHorizontal: 20,
+    marginTop: 60,
+    paddingHorizontal: 10,
   },
   feature: {
     alignItems: 'center',
+    flex: 1,
+  },
+  featureIcon: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    backgroundColor: 'rgba(30, 144, 255, 0.1)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 12,
+    borderWidth: 1,
+    borderColor: 'rgba(30, 144, 255, 0.3)',
   },
   featureText: {
-    color: '#888',
-    fontSize: 12,
-    marginTop: 8,
+    color: '#FFFFFF',
+    fontSize: 14,
+    fontWeight: '700',
     textAlign: 'center',
+    letterSpacing: 0.5,
+  },
+  featureSubtext: {
+    color: '#AAAAAA',
+    fontSize: 12,
+    textAlign: 'center',
+    marginTop: 4,
   },
 });
