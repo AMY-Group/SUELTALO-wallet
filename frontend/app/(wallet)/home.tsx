@@ -14,6 +14,10 @@ import {
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
+import * as SecureStore from 'expo-secure-store';
+import { Connection, PublicKey, LAMPORTS_PER_SOL } from '@solana/web3.js';
+import { getAssociatedTokenAddress, getAccount } from '@solana/spl-token';
+import Constants from 'expo-constants';
 import { WalletService } from '../../services/WalletService';
 import { ApiService } from '../../services/ApiService';
 import { ErrorBoundary } from '../../components/ErrorBoundary';
