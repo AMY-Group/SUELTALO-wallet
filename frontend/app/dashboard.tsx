@@ -824,4 +824,52 @@ const styles = StyleSheet.create({
   activityEmoji: {
     fontSize: 18,
   },
+  // DEBUG STYLES
+  debugBlock: {
+    height: 120,
+    backgroundColor: '#111',
+    borderColor: '#1E90FF',
+    borderWidth: 2,
+    borderRadius: 16,
+    margin: 16,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  debugText: {
+    color: '#FFFFFF',
+    fontSize: 20,
+    fontWeight: '900',
+    letterSpacing: 1,
+    textAlign: 'center',
+  },
+  debugCardsContainer: {
+    paddingHorizontal: 16,
+    gap: 12,
+  },
+  debugCard: {
+    height: 90,
+    borderRadius: 16,
+    borderWidth: 2,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  debugCardUsdc: {
+    backgroundColor: 'rgba(30, 144, 255, 0.1)',
+    borderColor: '#1E90FF',
+  },
+  debugCardSlt: {
+    backgroundColor: 'rgba(255, 0, 110, 0.1)',
+    borderColor: '#FF006E',
+  },
+  debugCardSol: {
+    backgroundColor: 'rgba(0, 255, 136, 0.1)',
+    borderColor: '#00FF88',
+  },
+  debugCardLabel: {
+    color: '#FFFFFF',
+    fontSize: 24,
+    fontWeight: '800',
+    letterSpacing: 2,
+  },
 });
