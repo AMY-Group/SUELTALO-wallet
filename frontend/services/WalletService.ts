@@ -138,7 +138,7 @@ export class WalletService {
       await AsyncStorage.setItem(this.WALLET_KEY, JSON.stringify(walletData));
       
       // Store mnemonic securely
-      await SecureStore.setItemAsync(this.SEED_PHRASE_KEY, mnemonic);
+      await this.setSecureItem(this.SEED_PHRASE_KEY, mnemonic);
       
       return {
         keypair,
@@ -174,7 +174,7 @@ export class WalletService {
       await AsyncStorage.setItem(this.WALLET_KEY, JSON.stringify(walletData));
       
       // Store mnemonic securely
-      await SecureStore.setItemAsync(this.SEED_PHRASE_KEY, mnemonic);
+      await this.setSecureItem(this.SEED_PHRASE_KEY, mnemonic);
       
       return {
         keypair,
