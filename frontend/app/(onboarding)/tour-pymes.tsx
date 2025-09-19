@@ -18,11 +18,11 @@ export default function TourPyMesScreen() {
 
   const handleContinue = () => {
     // Navigate to next tour step (3/3)
-    router.push('/tour-freelancers');
+    router.push('/(onboarding)/tour-freelancers');
   };
 
   const handleSkip = () => {
-    router.push('/(onboarding)/create');
+    router.push('/(onboarding)/final');
   };
 
   return (
