@@ -197,12 +197,12 @@ const styles = StyleSheet.create({
   featureItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(255, 0, 110, 0.1)',
+    backgroundColor: 'rgba(30, 144, 255, 0.1)',
     borderRadius: 16,
     paddingHorizontal: 20,
     paddingVertical: 16,
     borderWidth: 1,
-    borderColor: 'rgba(255, 0, 110, 0.3)',
+    borderColor: 'rgba(30, 144, 255, 0.3)',
   },
   featureEmoji: {
     fontSize: 20,
