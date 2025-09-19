@@ -102,15 +102,20 @@ export default function DashboardScreen() {
 
   const loadWalletData = async () => {
     try {
-      const wallet = await WalletService.getStoredWalletData();
-      if (!wallet) {
-        router.replace('/');
+      // Read pubkey from SecureStore
+      const storedSecret = await SecureStore.getItemAsync('secret');
+      const storedPublicKey = await SecureStore.getItemAsync('publicKey');
+      
+      if (!storedSecret || !storedPublicKey) {
+        console.log('No wallet found in SecureStore, showing CTA');
+        setShowWalletCTA(true);
+        setLoading(false);
         return;
       }
       
-      setWalletData(wallet);
-      await loadBalances(wallet.publicKey);
-      await loadTransactions(wallet.publicKey);
+      setPublicKey(storedPublicKey);
+      await loadDevnetBalances(storedPublicKey);
+      setLastUpdated(new Date());
     } catch (error) {
       console.error('Error loading wallet data:', error);
       Alert.alert('Oops', 'No pudimos cargar tu información, inténtalo de nuevo');
