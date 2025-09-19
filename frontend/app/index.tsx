@@ -6,21 +6,33 @@ import { LinearGradient } from 'expo-linear-gradient';
 
 export default function Index() {
   const [isLoading, setIsLoading] = useState(true);
+  const [hasSeenWelcome, setHasSeenWelcome] = useState(false);
   const [hasWallet, setHasWallet] = useState(false);
 
   useEffect(() => {
-    checkWalletExists();
+    checkAppState();
   }, []);
 
-  const checkWalletExists = async () => {
+  const checkAppState = async () => {
     try {
+      // Check if user has seen welcome screen
+      const welcomeSeen = await SecureStore.getItemAsync('welcomeSeen');
+      
+      if (!welcomeSeen) {
+        console.log('First time user, showing welcome screen');
+        setIsLoading(false);
+        return;
+      }
+
+      setHasSeenWelcome(true);
+
+      // Check wallet existence
       const secret = await SecureStore.getItemAsync('secret');
       console.log('Checking wallet existence:', secret ? 'Found' : 'Not found');
       
-      // Normal logic:
       setHasWallet(!!secret);
     } catch (error) {
-      console.error('Error checking wallet:', error);
+      console.error('Error checking app state:', error);
       setHasWallet(false);
     } finally {
       setIsLoading(false);
@@ -41,6 +53,11 @@ export default function Index() {
         </LinearGradient>
       </View>
     );
+  }
+
+  // Show welcome screen for first-time users
+  if (!hasSeenWelcome) {
+    return <Redirect href="/welcome" />;
   }
 
   // Redirect based on wallet existence
