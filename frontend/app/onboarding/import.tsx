@@ -15,6 +15,7 @@ import {
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 import { WalletService } from '../../services/WalletService';
 
 export default function ImportWalletScreen() {
@@ -26,13 +27,13 @@ export default function ImportWalletScreen() {
 
   const validateAndImportWallet = async () => {
     if (!seedPhrase.trim()) {
-      Alert.alert('Error', 'Please enter your seed phrase');
+      Alert.alert('¡Órale!', 'Ponle tus palabras secretas primero');
       return;
     }
 
     const words = seedPhrase.trim().split(/\s+/);
     if (words.length < 12 || words.length > 24) {
-      Alert.alert('Error', 'Seed phrase must be 12-24 words');
+      Alert.alert('¡Revisa tus palabras!', 'Deben ser entre 12 y 24 palabras');
       return;
     }
 
@@ -42,7 +43,7 @@ export default function ImportWalletScreen() {
       setWalletData(wallet);
       setStep(2);
     } catch (error) {
-      Alert.alert('Error', 'Invalid seed phrase. Please check and try again.');
+      Alert.alert('¡Esas palabras no están bien!', 'Revísalas otra vez o pregúntale a quien te las dio');
       console.error('Wallet import error:', error);
     } finally {
       setLoading(false);
@@ -51,11 +52,11 @@ export default function ImportWalletScreen() {
 
   const finishImport = () => {
     Alert.alert(
-      'Wallet Imported Successfully!',
-      'Your SUÉLTALO wallet has been imported and is ready to use.',
+      '¡Órale! Tu billetera ya está aquí 🎉',
+      'Todas tus cosas están como las dejaste. ¡Ya puedes usar tu lana!',
       [
         {
-          text: 'Go to Dashboard',
+          text: 'Ver mi billetera',
           onPress: () => router.replace('/dashboard'),
         },
       ]
@@ -68,38 +69,45 @@ export default function ImportWalletScreen() {
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
       <View style={styles.iconContainer}>
-        <Ionicons name="download-outline" size={60} color="#00D4FF" />
+        <Ionicons name="download-outline" size={60} color="#1E90FF" />
       </View>
       
-      <Text style={styles.title}>Import Existing Wallet</Text>
+      <Text style={styles.title}>¡Trae tu billetera de vuelta!</Text>
       <Text style={styles.subtitle}>
-        Enter your 12 or 24-word seed phrase to restore your wallet. Make sure you're in a secure location.
+        Pon tus 12 o 24 palabras secretas para recuperar tu lana. Asegúrate de estar en un lugar seguro.
       </Text>
 
       <View style={styles.inputContainer}>
-        <Text style={styles.inputLabel}>Seed Phrase</Text>
-        <TextInput
-          style={styles.seedInput}
-          placeholder="Enter your seed phrase words separated by spaces..."
-          placeholderTextColor="#666"
-          value={seedPhrase}
-          onChangeText={setSeedPhrase}
-          multiline
-          numberOfLines={4}
-          textAlignVertical="top"
-          autoCapitalize="none"
-          autoCorrect={false}
-          secureTextEntry={false}
-        />
+        <Text style={styles.inputLabel}>Tus palabras secretas</Text>
+        <LinearGradient
+          colors={seedPhrase ? ['rgba(30, 144, 255, 0.2)', 'rgba(255, 0, 110, 0.2)'] : ['rgba(255, 255, 255, 0.05)', 'rgba(255, 255, 255, 0.02)']}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={styles.inputGradient}
+        >
+          <TextInput
+            style={styles.seedInput}
+            placeholder="Escribe tus palabras aquí, separadas por espacios..."
+            placeholderTextColor="#666666"
+            value={seedPhrase}
+            onChangeText={setSeedPhrase}
+            multiline
+            numberOfLines={4}
+            textAlignVertical="top"
+            autoCapitalize="none"
+            autoCorrect={false}
+            secureTextEntry={false}
+          />
+        </LinearGradient>
         <Text style={styles.wordCount}>
-          {seedPhrase.trim().split(/\s+/).filter(word => word.length > 0).length} words
+          {seedPhrase.trim().split(/\s+/).filter(word => word.length > 0).length} palabras
         </Text>
       </View>
 
       <View style={styles.warningBox}>
         <Ionicons name="shield-checkmark" size={20} color="#00FF88" />
         <Text style={styles.warningText}>
-          Your seed phrase is processed locally and never sent to our servers.
+          Tus palabras se quedan en tu teléfono nada más. No las mandamos a ningún lado.
         </Text>
       </View>
 
@@ -108,14 +116,21 @@ export default function ImportWalletScreen() {
         onPress={validateAndImportWallet}
         disabled={!seedPhrase.trim() || loading}
       >
-        {loading ? (
-          <ActivityIndicator color="#0a0a0a" size="small" />
-        ) : (
-          <>
-            <Ionicons name="checkmark-circle" size={20} color="#0a0a0a" />
-            <Text style={styles.primaryButtonText}>Import Wallet</Text>
-          </>
-        )}
+        <LinearGradient
+          colors={(!seedPhrase.trim() || loading) ? ['#333333', '#444444'] : ['#1E90FF', '#00BFFF']}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 0 }}
+          style={styles.buttonGradient}
+        >
+          {loading ? (
+            <ActivityIndicator color="#FFFFFF" size="small" />
+          ) : (
+            <>
+              <Ionicons name="checkmark-circle" size={20} color="#FFFFFF" />
+              <Text style={styles.primaryButtonText}>¡Traer mi billetera!</Text>
+            </>
+          )}
+        </LinearGradient>
       </TouchableOpacity>
     </KeyboardAvoidingView>
   );
@@ -126,44 +141,65 @@ export default function ImportWalletScreen() {
         <Ionicons name="checkmark-circle" size={60} color="#00FF88" />
       </View>
 
-      <Text style={styles.title}>Wallet Imported!</Text>
+      <Text style={styles.title}>¡Órale! Tu billetera ya está aquí 🎉</Text>
       <Text style={styles.subtitle}>
-        Your wallet has been successfully imported. You can now access your funds and transaction history.
+        Todo salió perfecto. Tu billetera ya está lista y puedes ver tu lana y todos tus movimientos.
       </Text>
 
       <View style={styles.walletInfo}>
-        <Text style={styles.walletLabel}>Wallet Address:</Text>
-        <Text style={styles.walletAddress}>{walletData?.publicKey}</Text>
+        <LinearGradient
+          colors={['rgba(0, 255, 136, 0.1)', 'rgba(30, 144, 255, 0.1)']}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={styles.walletGradient}
+        >
+          <Text style={styles.walletLabel}>Tu dirección de billetera:</Text>
+          <Text style={styles.walletAddress}>{walletData?.publicKey}</Text>
+        </LinearGradient>
       </View>
 
       <TouchableOpacity
         style={styles.primaryButton}
         onPress={finishImport}
       >
-        <Ionicons name="arrow-forward" size={20} color="#0a0a0a" />
-        <Text style={styles.primaryButtonText}>Access My Wallet</Text>
+        <LinearGradient
+          colors={['#00FF88', '#4CAF50']}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 0 }}
+          style={styles.buttonGradient}
+        >
+          <Ionicons name="arrow-forward" size={20} color="#FFFFFF" />
+          <Text style={styles.primaryButtonText}>¡Ver mi lana!</Text>
+        </LinearGradient>
       </TouchableOpacity>
     </View>
   );
 
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor="#0a0a0a" />
+      <StatusBar barStyle="light-content" backgroundColor="#0C0C0C" />
       
-      <View style={styles.header}>
-        <TouchableOpacity 
-          style={styles.backButton} 
-          onPress={() => router.back()}
-        >
-          <Ionicons name="arrow-back" size={24} color="#00D4FF" />
-        </TouchableOpacity>
-        
-        <Text style={styles.headerTitle}>Import Wallet</Text>
-        
-        <View style={styles.stepIndicator}>
-          <Text style={styles.stepText}>{step}/2</Text>
+      <LinearGradient
+        colors={['#1E90FF', '#FF006E']}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={styles.gradientHeader}
+      >
+        <View style={styles.header}>
+          <TouchableOpacity 
+            style={styles.backButton} 
+            onPress={() => router.back()}
+          >
+            <Ionicons name="arrow-back" size={24} color="#FFFFFF" />
+          </TouchableOpacity>
+          
+          <Text style={styles.headerTitle}>Traer Billetera</Text>
+          
+          <View style={styles.stepIndicator}>
+            <Text style={styles.stepText}>{step}/2</Text>
+          </View>
         </View>
-      </View>
+      </LinearGradient>
 
       <ScrollView style={styles.scrollContainer} showsVerticalScrollIndicator={false}>
         {step === 1 && renderStep1()}
@@ -176,36 +212,44 @@ export default function ImportWalletScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0a0a0a',
+    backgroundColor: '#0C0C0C',
+  },
+  gradientHeader: {
+    paddingTop: 50,
+    paddingBottom: 20,
+    paddingHorizontal: 20,
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingVertical: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: '#1a1a1a',
+    justifyContent: 'space-between',
   },
   backButton: {
-    padding: 4,
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   headerTitle: {
     flex: 1,
     textAlign: 'center',
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#fff',
+    fontSize: 20,
+    fontWeight: '800',
+    color: '#FFFFFF',
+    letterSpacing: 1,
   },
   stepIndicator: {
-    backgroundColor: '#1a1a1a',
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 12,
   },
   stepText: {
-    color: '#00D4FF',
+    color: '#FFFFFF',
     fontSize: 12,
-    fontWeight: '600',
+    fontWeight: '700',
   },
   scrollContainer: {
     flex: 1,
@@ -217,58 +261,64 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   iconContainer: {
-    marginBottom: 24,
+    marginBottom: 30,
   },
   title: {
-    fontSize: 24,
-    fontWeight: '700',
-    color: '#fff',
+    fontSize: 26,
+    fontWeight: '800',
+    color: '#FFFFFF',
     textAlign: 'center',
-    marginBottom: 12,
+    marginBottom: 16,
+    letterSpacing: 0.5,
   },
   subtitle: {
     fontSize: 16,
-    color: '#888',
+    color: '#AAAAAA',
     textAlign: 'center',
-    lineHeight: 22,
-    marginBottom: 32,
+    lineHeight: 24,
+    marginBottom: 40,
+    paddingHorizontal: 10,
   },
   inputContainer: {
     width: '100%',
-    marginBottom: 24,
+    marginBottom: 30,
   },
   inputLabel: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '600',
-    marginBottom: 8,
+    color: '#FFFFFF',
+    fontSize: 18,
+    fontWeight: '700',
+    marginBottom: 12,
+    letterSpacing: 0.5,
+  },
+  inputGradient: {
+    borderRadius: 16,
+    borderWidth: 2,
+    borderColor: 'rgba(30, 144, 255, 0.3)',
   },
   seedInput: {
-    backgroundColor: '#1a1a1a',
-    borderWidth: 1,
-    borderColor: '#333',
-    borderRadius: 12,
-    padding: 16,
-    color: '#fff',
+    padding: 20,
+    color: '#FFFFFF',
     fontSize: 16,
     minHeight: 120,
     textAlignVertical: 'top',
+    lineHeight: 24,
   },
   wordCount: {
-    color: '#666',
+    color: '#AAAAAA',
     fontSize: 12,
     marginTop: 8,
     textAlign: 'right',
+    fontWeight: '600',
   },
   warningBox: {
-    backgroundColor: '#1a1a1a',
+    backgroundColor: 'rgba(0, 255, 136, 0.1)',
     borderWidth: 1,
     borderColor: '#00FF88',
-    borderRadius: 12,
-    padding: 16,
+    borderRadius: 16,
+    padding: 20,
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 32,
+    marginBottom: 40,
     width: '100%',
   },
   warningText: {
@@ -277,41 +327,47 @@ const styles = StyleSheet.create({
     flex: 1,
     marginLeft: 12,
     lineHeight: 20,
+    fontWeight: '600',
   },
   primaryButton: {
-    backgroundColor: '#00D4FF',
-    paddingVertical: 16,
-    paddingHorizontal: 24,
-    borderRadius: 12,
+    borderRadius: 16,
+    overflow: 'hidden',
+    width: '100%',
+  },
+  disabledButton: {
+    opacity: 0.5,
+  },
+  buttonGradient: {
+    paddingVertical: 20,
+    paddingHorizontal: 32,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 8,
-    minWidth: 200,
-  },
-  disabledButton: {
-    backgroundColor: '#333',
-    opacity: 0.5,
+    gap: 12,
   },
   primaryButtonText: {
-    color: '#0a0a0a',
-    fontSize: 16,
-    fontWeight: '600',
+    color: '#FFFFFF',
+    fontSize: 18,
+    fontWeight: '700',
+    letterSpacing: 0.5,
   },
   walletInfo: {
-    backgroundColor: '#1a1a1a',
-    borderRadius: 12,
-    padding: 20,
-    marginBottom: 32,
     width: '100%',
+    marginBottom: 40,
+    borderRadius: 16,
+    overflow: 'hidden',
+  },
+  walletGradient: {
+    padding: 24,
   },
   walletLabel: {
-    color: '#888',
-    fontSize: 14,
-    marginBottom: 8,
+    color: '#AAAAAA',
+    fontSize: 16,
+    fontWeight: '600',
+    marginBottom: 12,
   },
   walletAddress: {
-    color: '#fff',
+    color: '#FFFFFF',
     fontSize: 12,
     fontFamily: 'monospace',
     lineHeight: 18,

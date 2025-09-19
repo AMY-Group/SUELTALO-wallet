@@ -72,7 +72,7 @@ export default function ReceiveScreen() {
       setWalletData(wallet);
     } catch (error) {
       console.error('Error loading wallet data:', error);
-      Alert.alert('Error', 'No se pudo cargar la información de la billetera');
+      Alert.alert('¡Órale!', 'No pudimos cargar tu billetera, inténtalo otra vez');
     } finally {
       setLoading(false);
     }
@@ -99,18 +99,18 @@ export default function ReceiveScreen() {
         }),
       ]).start();
 
-      Alert.alert('¡Copiado! 📋', 'Dirección copiada al portapapeles');
+      Alert.alert('¡Listo! 📋', 'Tu dirección ya está copiada, péganla donde la necesites');
     } catch (error) {
       console.error('Error copying address:', error);
-      Alert.alert('Error', 'No se pudo copiar la dirección');
+      Alert.alert('¡No se pudo!', 'Algo falló, inténtalo otra vez');
     }
   };
 
   const handleShareAddress = async () => {
     try {
       await Share.share({
-        message: `Mi dirección de billetera SUÉLTALO:\n\n${walletData.publicKey}\n\n¡Envíame crypto en Solana! 🚀`,
-        title: 'Mi Dirección SUÉLTALO',
+        message: `¡Órale! Aquí está mi dirección de SUÉLTALO para que me mandes lana:\n\n${walletData.publicKey}\n\n¡Mándamela al toque! 🚀💰`,
+        title: 'Mi dirección SUÉLTALO',
       });
     } catch (error) {
       console.error('Error sharing address:', error);
@@ -131,7 +131,7 @@ export default function ReceiveScreen() {
           end={{ x: 1, y: 1 }}
           style={styles.gradientOverlay}
         >
-          <Text style={styles.loadingText}>Cargando código QR...</Text>
+          <Text style={styles.loadingText}>Preparando tu código QR... 📱</Text>
         </LinearGradient>
       </SafeAreaView>
     );
@@ -156,7 +156,7 @@ export default function ReceiveScreen() {
             <Ionicons name="arrow-back" size={28} color="#FFFFFF" />
           </TouchableOpacity>
           
-          <Text style={styles.headerTitle}>Recibir Crypto</Text>
+          <Text style={styles.headerTitle}>Cobrar Lana 💰</Text>
           
           <TouchableOpacity style={styles.shareButton} onPress={handleShareAddress}>
             <Ionicons name="share-outline" size={28} color="#FFFFFF" />
@@ -175,11 +175,11 @@ export default function ReceiveScreen() {
           >
             <View style={styles.instructionsContent}>
               <View style={styles.instructionsIcon}>
-                <Text style={styles.instructionsEmoji}>📱</Text>
+                <Text style={styles.instructionsEmoji}>💸</Text>
               </View>
-              <Text style={styles.instructionsTitle}>¡Recibe Crypto Fácil!</Text>
+              <Text style={styles.instructionsTitle}>¡Es súper fácil cobrar!</Text>
               <Text style={styles.instructionsText}>
-                Comparte tu código QR o dirección de billetera para recibir USDC, SOL y otros tokens en Solana
+                Comparte tu código QR o dirección para que te manden USDC, SOL o cualquier token sin broncas
               </Text>
             </View>
           </LinearGradient>
@@ -226,7 +226,7 @@ export default function ReceiveScreen() {
                 {/* Digital Graffiti Overlay */}
                 <View style={styles.qrOverlay}>
                   <Text style={styles.qrOverlayText}>SUÉLTALO</Text>
-                  <Text style={styles.qrOverlaySubtext}>SCAN ME 🚀</Text>
+                  <Text style={styles.qrOverlaySubtext}>¡ESCANÉAME! 🚀</Text>
                 </View>
               </View>
             </LinearGradient>
@@ -235,7 +235,7 @@ export default function ReceiveScreen() {
 
         {/* Address Info */}
         <Animated.View style={[styles.addressSection, { opacity: fadeAnim }]}>
-          <Text style={styles.addressTitle}>📍 Tu Dirección de Billetera</Text>
+          <Text style={styles.addressTitle}>📱 Tu dirección de billetera</Text>
           
           <LinearGradient
             colors={['rgba(255, 255, 255, 0.05)', 'rgba(255, 255, 255, 0.02)']}
@@ -245,7 +245,7 @@ export default function ReceiveScreen() {
           >
             <View style={styles.addressContainer}>
               <View style={styles.addressContent}>
-                <Text style={styles.addressLabel}>Dirección Completa:</Text>
+                <Text style={styles.addressLabel}>Dirección completa:</Text>
                 <Text style={styles.fullAddress}>{walletData?.publicKey}</Text>
                 <Text style={styles.shortAddress}>{formatAddress(walletData?.publicKey)}</Text>
               </View>
@@ -264,7 +264,7 @@ export default function ReceiveScreen() {
 
         {/* Supported Tokens */}
         <Animated.View style={[styles.tokensSection, { opacity: fadeAnim }]}>
-          <Text style={styles.tokensTitle}>💰 Tokens Soportados</Text>
+          <Text style={styles.tokensTitle}>💰 Lana que puedes recibir</Text>
           
           <View style={styles.tokensList}>
             <View style={styles.tokenItem}>
@@ -277,9 +277,9 @@ export default function ReceiveScreen() {
                 </View>
                 <View style={styles.tokenInfo}>
                   <Text style={styles.tokenSymbol}>USDC</Text>
-                  <Text style={styles.tokenName}>Dólares Digitales</Text>
+                  <Text style={styles.tokenName}>Dólares digitales</Text>
                 </View>
-                <Text style={styles.tokenBadge}>PRINCIPAL</Text>
+                <Text style={styles.tokenBadge}>LO MÁS USADO</Text>
               </LinearGradient>
             </View>
 
@@ -293,9 +293,9 @@ export default function ReceiveScreen() {
                 </View>
                 <View style={styles.tokenInfo}>
                   <Text style={styles.tokenSymbol}>SOL</Text>
-                  <Text style={styles.tokenName}>Solana</Text>
+                  <Text style={styles.tokenName}>Para fees</Text>
                 </View>
-                <Text style={styles.tokenBadge}>RED</Text>
+                <Text style={styles.tokenBadge}>SOLANA</Text>
               </LinearGradient>
             </View>
 
@@ -309,9 +309,9 @@ export default function ReceiveScreen() {
                 </View>
                 <View style={styles.tokenInfo}>
                   <Text style={styles.tokenSymbol}>SLT</Text>
-                  <Text style={styles.tokenName}>SUÉLTALO Token</Text>
+                  <Text style={styles.tokenName}>Tokens de premio</Text>
                 </View>
-                <Text style={styles.tokenBadge}>REWARDS</Text>
+                <Text style={styles.tokenBadge}>PREMIOS</Text>
               </LinearGradient>
             </View>
           </View>
@@ -327,7 +327,7 @@ export default function ReceiveScreen() {
               style={styles.actionGradient}
             >
               <Ionicons name="copy" size={24} color="#FFFFFF" style={styles.actionIcon} />
-              <Text style={styles.actionText}>Copiar Dirección</Text>
+              <Text style={styles.actionText}>Copiar dirección</Text>
             </LinearGradient>
           </TouchableOpacity>
 
@@ -349,7 +349,7 @@ export default function ReceiveScreen() {
           <View style={styles.safetyNotice}>
             <Ionicons name="shield-checkmark" size={20} color="#00FF88" />
             <Text style={styles.safetyText}>
-              🛡️ Solo comparte tu dirección pública. Nunca compartas tu frase semilla
+              🛡️ Solo comparte tu dirección pública. Nunca compartas tu frase semilla con nadie, ¡es tuya nada más!
             </Text>
           </View>
         </Animated.View>
