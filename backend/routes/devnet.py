@@ -171,9 +171,9 @@ async def get_airdrop_stats(address: str):
 @router.post("/webhook/helius")
 async def helius_webhook(
     request: Request,
-    x_helius_signature: Optional[str] = Header(None),
-    x_helius_event_id: Optional[str] = Header(None),
-    x_helius_timestamp: Optional[str] = Header(None)
+    x_helius_signature: Optional[str] = Header(None, alias="X-Helius-Signature"),
+    x_helius_event_id: Optional[str] = Header(None, alias="X-Helius-Event-Id"),
+    x_helius_timestamp: Optional[str] = Header(None, alias="X-Helius-Timestamp")
 ):
     """
     Helius webhook endpoint with signature verification and replay protection
