@@ -107,39 +107,72 @@ user_problem_statement: "Implement Frontend Web3 Integration for SUÉLTALO walle
 backend:
   - task: "Devnet Balance Endpoint"
     implemented: true
-    working: "NA"
+    working: true
     file: "backend/routes/devnet.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
         - working: "NA"
           agent: "main"
           comment: "Implementado GET /api/devnet/balance/:address para obtener balances SOL/SLT/USDC desde Devnet. Necesita pruebas."
+        - working: true
+          agent: "testing"
+          comment: "✅ GET /api/devnet/balance/:address working correctly. Successfully returns SOL, SLT, and USDC balances from Solana Devnet with proper response structure (address, sol_balance, slt_balance, usdc_balance, timestamp). Tested with treasury address ERXnmYXWkMeWGJR54RUX7qUvfkz7qEBhVW4aAx6wcvv8 and invalid addresses. Error handling works properly."
 
   - task: "Devnet Verify Transaction Endpoint"
     implemented: true
-    working: "NA"
+    working: true
     file: "backend/routes/devnet.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
         - working: "NA"
           agent: "main"
           comment: "Implementado POST /api/devnet/verify-transaction para verificar transacciones y calcular rewards SLT. Necesita pruebas."
+        - working: true
+          agent: "testing"
+          comment: "✅ POST /api/devnet/verify-transaction working correctly. Properly returns 404 for non-existent transactions and has correct response structure (signature, valid, rewardedSLT, usdcAmount, data). SLT reward calculation logic (0.1 SLT per USDC) is implemented and ready for real transaction verification."
 
   - task: "Devnet Airdrop Stats Endpoint"
     implemented: true
-    working: "NA"
+    working: true
     file: "backend/routes/devnet.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
         - working: "NA"
           agent: "main"
           comment: "Implementado GET /api/devnet/airdrop-stats/:address para obtener estadísticas de airdrops SLT. Necesita pruebas."
+        - working: true
+          agent: "testing"
+          comment: "✅ GET /api/devnet/airdrop-stats/:address working correctly. Returns comprehensive airdrop statistics including address, date, total_received_today, remaining_today, cap_per_day (100 SLT), and max_per_transaction (10 SLT). Daily tracking and limits are properly implemented."
+
+  - task: "Devnet Faucet Endpoint"
+    implemented: true
+    working: true
+    file: "backend/routes/devnet.py"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: false
+    status_history:
+        - working: true
+          agent: "testing"
+          comment: "✅ POST /api/devnet/faucet working correctly. Returns proper instructions for client-side SOL airdrop with RPC URL (https://api.devnet.solana.com), address, and amount. Correctly delegates to client-side requestAirdrop functionality."
+
+  - task: "Devnet SLT Airdrop Endpoint"
+    implemented: true
+    working: true
+    file: "backend/routes/devnet.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: true
+          agent: "testing"
+          comment: "✅ POST /api/devnet/airdrop-slt working correctly. Validates airdrop requests with proper caps and limits, returns success/failure status with appropriate messages. Airdrop approval system working for frontend minting integration."
 
   - task: "Health Check Endpoint"
     implemented: true
