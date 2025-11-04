@@ -255,18 +255,25 @@ class SolanaService:
             # Amount validation
             base_amount = int(amount * SLT_MULTIPLIER)
             
-            if base_amount > SINGLE_AIRDROP_MAX:
-                return False, f"Amount exceeds single airdrop limit ({SINGLE_AIRDROP_MAX / SLT_MULTIPLIER} SLT)"
+            if base_amount > MAX_SLT_PER_TX:
+                return False, f"Amount exceeds MAX_SLT_PER_TX ({MAX_SLT_PER_TX / SLT_MULTIPLIER} SLT)"
             
-            # Daily cap check
+            # User daily cap check
             today = datetime.utcnow().date().isoformat()
             user_key = f"{recipient_address}:{today}"
             
-            daily_total = sum(self.airdrop_history.get(user_key, []))
+            user_daily_total = sum(self.airdrop_history.get(user_key, []))
             
-            if daily_total + base_amount > DAILY_AIRDROP_CAP_PER_USER:
-                remaining = (DAILY_AIRDROP_CAP_PER_USER - daily_total) / SLT_MULTIPLIER
-                return False, f"Daily airdrop cap exceeded. Remaining: {remaining} SLT"
+            if user_daily_total + base_amount > USER_DAILY_SLT_CAP:
+                remaining = (USER_DAILY_SLT_CAP - user_daily_total) / SLT_MULTIPLIER
+                return False, f"USER_DAILY_SLT_CAP exceeded. Remaining: {remaining} SLT"
+            
+            # Global daily cap check
+            global_daily_total = self.global_daily_airdrop.get(today, 0)
+            
+            if global_daily_total + base_amount > GLOBAL_DAILY_SLT_CAP:
+                remaining = (GLOBAL_DAILY_SLT_CAP - global_daily_total) / SLT_MULTIPLIER
+                return False, f"GLOBAL_DAILY_SLT_CAP exceeded. Remaining: {remaining} SLT"
             
             # On-chain verification if trigger transaction provided
             if trigger_tx_signature:
