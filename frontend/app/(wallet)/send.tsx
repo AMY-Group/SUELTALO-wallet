@@ -109,13 +109,53 @@ export default function SendScreen() {
 
     setLoading(true);
     try {
-      // Create transaction record
-      const transaction = await ApiService.createTransaction({
-        from_address: walletData.publicKey,
-        to_address: recipientAddress,
-        amount: parseFloat(amount),
-        token_type: selectedToken,
-      });
+      let result;
+      let rewardedSLT = 0;
+
+      // Send transaction using TokenService
+      if (selectedToken === 'SOL') {
+        const lamports = Math.floor(parseFloat(amount) * LAMPORTS_PER_SOL);
+        result = await TokenService.sendSOL({
+          to: recipientAddress,
+          lamports,
+        });
+      } else {
+        // Send SPL token (USDC-MOCK or SLT)
+        const mint = selectedToken === 'USDC' 
+          ? TokenService.getUSDCMockMint() 
+          : TokenService.getSLTMint();
+        
+        result = await TokenService.sendSPL({
+          mint,
+          decimals: 6, // USDC and SLT use 6 decimals
+          to: recipientAddress,
+          amount: parseFloat(amount),
+        });
+      }
+
+      if (!result.success) {
+        Alert.alert('¡No se pudo!', result.error || 'Error al enviar');
+        return;
+      }
+
+      // If USDC-MOCK was sent, verify transaction and get SLT reward
+      if (selectedToken === 'USDC' && result.signature) {
+        try {
+          const backendUrl = Constants.expoConfig?.extra?.EXPO_PUBLIC_BACKEND_URL || process.env.EXPO_PUBLIC_BACKEND_URL;
+          const verifyResponse = await fetch(`${backendUrl}/api/devnet/verify-transaction`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ signature: result.signature }),
+          });
+          
+          if (verifyResponse.ok) {
+            const verifyData = await verifyResponse.json();
+            rewardedSLT = verifyData.rewardedSLT || 0;
+          }
+        } catch (error) {
+          console.error('Error verifying transaction:', error);
+        }
+      }
 
       // Success animation
       Animated.sequence([
@@ -131,9 +171,14 @@ export default function SendScreen() {
         }),
       ]).start();
 
+      // Show success message
+      const rewardMessage = rewardedSLT > 0 
+        ? `\n\n🎁 ¡Ganaste ${rewardedSLT.toFixed(2)} SLT de reward!` 
+        : '';
+
       Alert.alert(
         '¡Órale! Tu lana ya salió 🚀',
-        `Mandaste ${amount} ${selectedToken} al toque`,
+        `Mandaste ${amount} ${selectedToken} al toque${rewardMessage}`,
         [
           {
             text: 'Ver movimiento',
@@ -149,9 +194,12 @@ export default function SendScreen() {
       // Reset form
       setRecipientAddress('');
       setAmount('');
-    } catch (error) {
+      
+      // Reload balances
+      await loadWalletData();
+    } catch (error: any) {
       console.error('Send error:', error);
-      Alert.alert('¡No se pudo!', 'Algo pasó, inténtalo otra vez');
+      Alert.alert('¡No se pudo!', error.message || 'Algo pasó, inténtalo otra vez');
     } finally {
       setLoading(false);
     }
