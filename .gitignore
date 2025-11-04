@@ -87,3 +87,7 @@ agenthub/agents/youtube/db
 # Emergent (auto-generados)
 .emergent/
 emergent.yml
+-e 
+# Environment files
+*.env
+*.env.*
