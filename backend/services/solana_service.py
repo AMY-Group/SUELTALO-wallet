@@ -1,31 +1,20 @@
 """
 Solana Devnet Integration Service
 Handles wallet management, token operations, and blockchain interactions
+Uses HTTP RPC API for maximum compatibility
 """
 
-from solana.rpc.async_api import AsyncClient
-from solana.rpc.commitment import Confirmed
-from solders.keypair import Keypair
-from solders.pubkey import Pubkey
-from solders.system_program import TransferParams, transfer
-from solders.transaction import Transaction
-from spl.token.async_client import AsyncToken
-from spl.token.constants import TOKEN_PROGRAM_ID
-from spl.token.instructions import (
-    get_associated_token_address,
-    create_associated_token_account,
-    mint_to,
-    MintToParams,
-    transfer as spl_transfer,
-    TransferParams as SPLTransferParams,
-)
+import httpx
 import base58
 import asyncio
-from typing import Optional, Dict, Any, Tuple
+import json
+from typing import Optional, Dict, Any, Tuple, List
 from datetime import datetime, timedelta
 import logging
 import os
 from pathlib import Path
+import hashlib
+import hmac
 
 logger = logging.getLogger(__name__)
 
