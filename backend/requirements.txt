@@ -25,5 +25,5 @@ jq>=1.6.0
 typer>=0.9.0
 solana>=0.34.0
 solders>=0.21.0
-spl-token>=0.2.0
+anchorpy-core>=0.2.0
 base58>=2.1.1
