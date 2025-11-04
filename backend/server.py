@@ -316,6 +316,9 @@ async def health_check():
 # Include the router in the main app
 app.include_router(api_router)
 
+# Include devnet routes
+app.include_router(devnet_router, prefix="/api")
+
 app.add_middleware(
     CORSMiddleware,
     allow_credentials=True,
@@ -331,9 +334,40 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
+# Startup event to initialize Solana service
+@app.on_event("startup")
+async def startup_event():
+    """Initialize services on startup"""
+    try:
+        # Get configuration from environment
+        treasury_pubkey = os.getenv("SOLANA_TREASURY_PUBKEY")
+        slt_mint = os.getenv("SOLANA_SLT_MINT")
+        usdc_mock_mint = os.getenv("SOLANA_USDC_MOCK_MINT")
+        webhook_secret = os.getenv("HELIUS_WEBHOOK_SECRET")
+        
+        # Initialize with defaults if not configured
+        if not treasury_pubkey:
+            logger.warning("SOLANA_TREASURY_PUBKEY not set, using mock mode")
+            treasury_pubkey = "11111111111111111111111111111111"  # System program placeholder
+        
+        await solana_service.initialize(
+            treasury_pubkey=treasury_pubkey,
+            slt_mint=slt_mint,
+            usdc_mock_mint=usdc_mock_mint,
+            webhook_secret=webhook_secret
+        )
+        
+        logger.info("Solana service initialized successfully")
+        
+    except Exception as e:
+        logger.error(f"Failed to initialize Solana service: {e}")
+        # Don't fail startup, service will work in degraded mode
+
 @app.on_event("shutdown")
-async def shutdown_db_client():
+async def shutdown_event():
+    """Cleanup on shutdown"""
     client.close()
+    await solana_service.close()
 
 if __name__ == "__main__":
     import uvicorn
