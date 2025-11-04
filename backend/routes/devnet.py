@@ -128,16 +128,25 @@ async def request_sol_faucet(request: FaucetRequest):
 
 @router.post("/verify-transaction")
 async def verify_transaction(request: TransactionVerifyRequest):
-    """Verify a transaction on-chain"""
+    """Verify a transaction on-chain and calculate SLT reward if USDC-MOCK transfer"""
     try:
         is_valid, tx_data = await solana_service.verify_transaction_on_chain(request.signature)
         
         if not is_valid:
             raise HTTPException(status_code=404, detail="Transaction not found or invalid")
         
+        # Calculate reward if USDC transfer found
+        rewarded_slt = 0.0
+        usdc_amount = await solana_service.get_usdc_transfer_amount(tx_data)
+        
+        if usdc_amount and usdc_amount > 0:
+            rewarded_slt = await solana_service.calculate_slt_reward(usdc_amount)
+        
         return {
             "signature": request.signature,
             "valid": True,
+            "rewardedSLT": rewarded_slt,
+            "usdcAmount": usdc_amount or 0.0,
             "data": tx_data
         }
         
