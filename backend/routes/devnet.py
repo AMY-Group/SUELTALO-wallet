@@ -170,53 +170,71 @@ async def get_airdrop_stats(address: str):
 
 
 @router.post("/webhook/helius")
-async def helius_webhook(
-    request: Request,
-    x_helius_signature: Optional[str] = Header(None, alias="X-Helius-Signature"),
-    x_helius_event_id: Optional[str] = Header(None, alias="X-Helius-Event-Id"),
-    x_helius_timestamp: Optional[str] = Header(None, alias="X-Helius-Timestamp")
-):
+async def helius_webhook(request: Request):
     """
     Helius webhook endpoint with signature verification and replay protection
     """
     try:
-        # Get payload
-        payload = await request.body()
+        # Get raw body for signature verification
+        body = await request.body()
+        
+        # Get headers (case-insensitive)
+        sig = request.headers.get("x-helius-signature") or request.headers.get("X-Helius-Signature") or ""
+        ts = request.headers.get("x-helius-timestamp") or request.headers.get("X-Helius-Timestamp") or ""
+        eid = request.headers.get("x-helius-event-id") or request.headers.get("X-Helius-Event-Id") or ""
         
         # Verify required headers
-        if not x_helius_signature or not x_helius_event_id or not x_helius_timestamp:
-            raise HTTPException(status_code=400, detail="Missing required webhook headers")
-        
-        # Verify signature
-        is_valid = solana_service.verify_webhook_signature(payload, x_helius_signature)
-        if not is_valid:
-            raise HTTPException(status_code=401, detail="Invalid webhook signature")
+        if not sig:
+            raise HTTPException(status_code=400, detail="missing signature")
         
         # Replay protection - check timestamp
-        current_time = int(time.time())
-        event_time = int(x_helius_timestamp)
+        WINDOW_SEC = 300  # 5 minutes
+        if ts:
+            try:
+                now = int(datetime.now(tz=timezone.utc).timestamp())
+                if abs(now - int(ts)) > WINDOW_SEC:
+                    raise HTTPException(status_code=401, detail="timestamp outside window")
+            except ValueError:
+                raise HTTPException(status_code=401, detail="invalid timestamp")
         
-        REPLAY_TIME_WINDOW = 300  # 5 minutes
-        if abs(current_time - event_time) > REPLAY_TIME_WINDOW:
-            raise HTTPException(status_code=400, detail="Webhook event timestamp outside allowed window")
+        # Verify signature using robust verifier
+        if not solana_service.webhook_secret:
+            logger.warning("Webhook secret not configured")
+            raise HTTPException(status_code=500, detail="Webhook not configured")
         
-        # Check if event already processed
-        if x_helius_event_id in solana_service.processed_signatures:
+        result = verify_signature(
+            body, 
+            sig, 
+            solana_service.webhook_secret,
+            timestamp=ts if ts else None,
+            event_id=eid if eid else None
+        )
+        
+        if not result.get("valid"):
+            logger.warning(f"Invalid webhook signature - tried all modes")
+            raise HTTPException(status_code=401, detail="invalid signature")
+        
+        # Check if event already processed (replay protection)
+        if eid and eid in solana_service.processed_signatures:
+            logger.info(f"Event already processed (idempotent): {eid}")
             raise HTTPException(status_code=409, detail="Replay attack detected")
         
         # Mark event as seen
-        solana_service.processed_signatures.add(x_helius_event_id)
+        if eid:
+            solana_service.processed_signatures.add(eid)
         
-        # Parse webhook data
+        # Parse webhook data (after signature verification)
         data = await request.json()
         
         # Process webhook event
-        # This would trigger automatic airdrops based on confirmed transactions
-        logger.info(f"Helius webhook received: {x_helius_event_id}")
-        
         # TODO: Process transaction and trigger SLT airdrop if USDC-MOCK transfer detected
+        logger.info(f"Helius webhook received: {eid} (mode: {result.get('mode')})")
         
-        return {"status": "success", "event_id": x_helius_event_id}
+        return {
+            "ok": True,
+            "mode": result.get("mode"),
+            "event_id": eid
+        }
         
     except HTTPException:
         raise
