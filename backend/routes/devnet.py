@@ -4,7 +4,7 @@ from typing import Optional, Dict, Any
 import os
 from datetime import datetime
 from motor.motor_asyncio import AsyncIOMotorClient
-from backend.security.webhook import verify_signature
+from security.webhook import verify_signature
 
 router = APIRouter()
 
