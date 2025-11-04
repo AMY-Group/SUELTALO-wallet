@@ -1,7 +1,10 @@
-import { Keypair, PublicKey } from '@solana/web3.js';
+import { Keypair, PublicKey, Connection, clusterApiUrl } from '@solana/web3.js';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as SecureStore from 'expo-secure-store';
 import { Platform } from 'react-native';
+import * as bip39 from 'bip39';
+import { derivePath } from 'ed25519-hd-key';
+import Constants from 'expo-constants';
 
 export interface WalletData {
   keypair: Keypair;
@@ -9,124 +12,72 @@ export interface WalletData {
   publicKey: string;
 }
 
-// Simple word list for mnemonic generation (subset of BIP39)
-const WORD_LIST = [
-  'abandon', 'ability', 'able', 'about', 'above', 'absent', 'absorb', 'abstract', 'absurd', 'abuse',
-  'access', 'accident', 'account', 'accuse', 'achieve', 'acid', 'acoustic', 'acquire', 'across', 'act',
-  'action', 'actor', 'actress', 'actual', 'adapt', 'add', 'addict', 'address', 'adjust', 'admit',
-  'adult', 'advance', 'advice', 'aerobic', 'affair', 'afford', 'afraid', 'again', 'against', 'agent',
-  'agree', 'ahead', 'aim', 'air', 'airport', 'aisle', 'alarm', 'album', 'alcohol', 'alert',
-  'alien', 'all', 'alley', 'allow', 'almost', 'alone', 'alpha', 'already', 'also', 'alter',
-  'always', 'amateur', 'amazing', 'among', 'amount', 'amused', 'analyst', 'anchor', 'ancient', 'anger',
-  'angle', 'angry', 'animal', 'ankle', 'announce', 'annual', 'another', 'answer', 'antenna', 'antique',
-  'anxiety', 'any', 'apart', 'apology', 'appear', 'apple', 'approve', 'april', 'arcade', 'arch',
-  'arctic', 'area', 'arena', 'argue', 'arm', 'armed', 'armor', 'army', 'around', 'arrange',
-  'arrest', 'arrive', 'arrow', 'art', 'article', 'artist', 'artwork', 'ask', 'aspect', 'assault',
-  'asset', 'assist', 'assume', 'asthma', 'athlete', 'atom', 'attack', 'attend', 'attitude', 'attract',
-  'auction', 'audit', 'august', 'aunt', 'author', 'auto', 'autumn', 'average', 'avocado', 'avoid',
-  'awake', 'aware', 'away', 'awesome', 'awful', 'awkward', 'axis'
-];
-
 export class WalletService {
   private static readonly WALLET_KEY = '@wallet_data';
   private static readonly SEED_PHRASE_KEY = '@secure_seed_phrase';
+  private static readonly LOCK_FLAG_KEY = '@wallet_locked';
+  private static connection: Connection | null = null;
+
+  // Get Solana Connection
+  static getConnection(): Connection {
+    if (!this.connection) {
+      const rpcUrl = Constants.expoConfig?.extra?.EXPO_PUBLIC_SOLANA_RPC || 
+                     process.env.EXPO_PUBLIC_SOLANA_RPC ||
+                     'https://api.devnet.solana.com';
+      this.connection = new Connection(rpcUrl, 'confirmed');
+    }
+    return this.connection;
+  }
 
   // Cross-platform secure storage helpers
   private static async setSecureItem(key: string, value: string): Promise<void> {
     if (Platform.OS === 'web') {
-      // Use AsyncStorage for web
       await AsyncStorage.setItem(key, value);
     } else {
-      // Use SecureStore for native
       await SecureStore.setItemAsync(key, value);
     }
   }
 
   private static async getSecureItem(key: string): Promise<string | null> {
     if (Platform.OS === 'web') {
-      // Use AsyncStorage for web
       return await AsyncStorage.getItem(key);
     } else {
-      // Use SecureStore for native
       return await SecureStore.getItemAsync(key);
     }
   }
 
   private static async deleteSecureItem(key: string): Promise<void> {
     if (Platform.OS === 'web') {
-      // Use AsyncStorage for web
       await AsyncStorage.removeItem(key);
     } else {
-      // Use SecureStore for native
       await SecureStore.deleteItemAsync(key);
     }
   }
 
-  private static generateSecureRandom(length: number): Uint8Array {
-    // Use crypto.getRandomValues if available (in secure contexts)
-    if (typeof crypto !== 'undefined' && crypto.getRandomValues) {
-      const array = new Uint8Array(length);
-      crypto.getRandomValues(array);
-      return array;
-    }
-    
-    // Fallback to Math.random (not cryptographically secure, but works for demo)
-    const array = new Uint8Array(length);
-    for (let i = 0; i < length; i++) {
-      array[i] = Math.floor(Math.random() * 256);
-    }
-    return array;
+  // Generate BIP39 mnemonic (12 words, 128 bits entropy)
+  static generateMnemonic(): string {
+    return bip39.generateMnemonic(128);
   }
 
-  private static generateMnemonic(): string {
-    const entropy = this.generateSecureRandom(16); // 128 bits
-    const words: string[] = [];
-    
-    // Simple conversion of entropy to words (simplified BIP39)
-    for (let i = 0; i < 12; i++) {
-      const index = (entropy[i] + (entropy[(i + 1) % 16] * 256)) % WORD_LIST.length;
-      words.push(WORD_LIST[index]);
-    }
-    
-    return words.join(' ');
+  // Validate BIP39 mnemonic
+  static validateMnemonic(mnemonic: string): boolean {
+    return bip39.validateMnemonic(mnemonic.trim());
   }
 
-  private static mnemonicToSeed(mnemonic: string): Uint8Array {
-    // Simple seed derivation (not BIP39 compliant, but works for demo)
-    const words = mnemonic.split(' ');
-    const seed = new Uint8Array(32);
-    
-    for (let i = 0; i < 32; i++) {
-      const wordIndex = i % words.length;
-      const word = words[wordIndex];
-      let hash = 0;
-      for (let j = 0; j < word.length; j++) {
-        hash = ((hash << 5) - hash + word.charCodeAt(j)) & 0xffffffff;
-      }
-      seed[i] = Math.abs(hash) % 256;
-    }
-    
-    return seed;
+  // Derive Keypair from mnemonic using BIP44 path for Solana
+  private static mnemonicToKeypair(mnemonic: string, accountIndex: number = 0): Keypair {
+    // BIP44 path for Solana: m/44'/501'/0'/0'
+    const seed = bip39.mnemonicToSeedSync(mnemonic);
+    const path = `m/44'/501'/${accountIndex}'/0'`;
+    const derivedSeed = derivePath(path, seed.toString('hex')).key;
+    return Keypair.fromSeed(derivedSeed);
   }
 
-  private static validateMnemonic(mnemonic: string): boolean {
-    const words = mnemonic.trim().split(/\s+/);
-    if (words.length < 12 || words.length > 24) return false;
-    
-    // Check if all words are in our word list
-    return words.every(word => WORD_LIST.includes(word.toLowerCase()));
-  }
-
+  // Generate new wallet with BIP39/BIP44
   static async generateNewWallet(): Promise<WalletData> {
     try {
-      // Generate mnemonic phrase
       const mnemonic = this.generateMnemonic();
-      
-      // Create seed from mnemonic
-      const seed = this.mnemonicToSeed(mnemonic);
-      
-      // Generate keypair from seed
-      const keypair = Keypair.fromSeed(seed);
+      const keypair = this.mnemonicToKeypair(mnemonic);
       
       const walletData = {
         mnemonic,
@@ -134,7 +85,7 @@ export class WalletService {
         secretKey: Array.from(keypair.secretKey),
       };
       
-      // Store wallet data
+      // Store wallet data in AsyncStorage
       await AsyncStorage.setItem(this.WALLET_KEY, JSON.stringify(walletData));
       
       // Store mnemonic securely
@@ -151,18 +102,14 @@ export class WalletService {
     }
   }
 
-  static async restoreWalletFromMnemonic(mnemonic: string): Promise<WalletData> {
+  // Import wallet from mnemonic
+  static async importFromMnemonic(mnemonic: string): Promise<WalletData> {
     try {
-      // Validate mnemonic
       if (!this.validateMnemonic(mnemonic)) {
         throw new Error('Invalid mnemonic phrase');
       }
       
-      // Create seed from mnemonic
-      const seed = this.mnemonicToSeed(mnemonic);
-      
-      // Generate keypair from seed
-      const keypair = Keypair.fromSeed(seed);
+      const keypair = this.mnemonicToKeypair(mnemonic);
       
       const walletData = {
         mnemonic,
@@ -170,10 +117,7 @@ export class WalletService {
         secretKey: Array.from(keypair.secretKey),
       };
       
-      // Store wallet data
       await AsyncStorage.setItem(this.WALLET_KEY, JSON.stringify(walletData));
-      
-      // Store mnemonic securely
       await this.setSecureItem(this.SEED_PHRASE_KEY, mnemonic);
       
       return {
@@ -182,12 +126,13 @@ export class WalletService {
         publicKey: keypair.publicKey.toString(),
       };
     } catch (error) {
-      console.error('Wallet restoration error:', error);
-      throw new Error(`Wallet restoration failed: ${error}`);
+      console.error('Wallet import error:', error);
+      throw new Error(`Wallet import failed: ${error}`);
     }
   }
 
-  static async loadStoredWallet(): Promise<Keypair | null> {
+  // Get stored keypair
+  static async getKeypair(): Promise<Keypair | null> {
     try {
       const storedData = await AsyncStorage.getItem(this.WALLET_KEY);
       if (!storedData) return null;
@@ -197,11 +142,24 @@ export class WalletService {
       
       return Keypair.fromSecretKey(secretKey);
     } catch (error) {
-      console.error('Failed to load stored wallet:', error);
+      console.error('Failed to load keypair:', error);
       return null;
     }
   }
 
+  // Get public key
+  static async getPublicKey(): Promise<PublicKey | null> {
+    const keypair = await this.getKeypair();
+    return keypair ? keypair.publicKey : null;
+  }
+
+  // Get address string
+  static async getAddress(): Promise<string | null> {
+    const publicKey = await this.getPublicKey();
+    return publicKey ? publicKey.toString() : null;
+  }
+
+  // Get stored wallet data
   static async getStoredWalletData(): Promise<any | null> {
     try {
       const storedData = await AsyncStorage.getItem(this.WALLET_KEY);
@@ -212,16 +170,29 @@ export class WalletService {
     }
   }
 
+  // Get seed phrase
+  static async getSeedPhrase(): Promise<string | null> {
+    try {
+      return await this.getSecureItem(this.SEED_PHRASE_KEY);
+    } catch (error) {
+      console.error('Failed to get seed phrase:', error);
+      return null;
+    }
+  }
+
+  // Clear wallet
   static async clearWallet(): Promise<void> {
     try {
       await AsyncStorage.removeItem(this.WALLET_KEY);
       await this.deleteSecureItem(this.SEED_PHRASE_KEY);
+      await AsyncStorage.removeItem(this.LOCK_FLAG_KEY);
     } catch (error) {
       console.error('Failed to clear wallet:', error);
       throw error;
     }
   }
 
+  // Validate public key
   static validatePublicKey(publicKey: string): boolean {
     try {
       new PublicKey(publicKey);
@@ -231,12 +202,22 @@ export class WalletService {
     }
   }
 
-  static async getSeedPhrase(): Promise<string | null> {
-    try {
-      return await this.getSecureItem(this.SEED_PHRASE_KEY);
-    } catch (error) {
-      console.error('Failed to get seed phrase:', error);
-      return null;
-    }
+  // Lock state management
+  static async setLocked(locked: boolean): Promise<void> {
+    await AsyncStorage.setItem(this.LOCK_FLAG_KEY, JSON.stringify(locked));
+  }
+
+  static async isLocked(): Promise<boolean> {
+    const flag = await AsyncStorage.getItem(this.LOCK_FLAG_KEY);
+    return flag ? JSON.parse(flag) : false;
+  }
+
+  // Legacy compatibility
+  static async loadStoredWallet(): Promise<Keypair | null> {
+    return this.getKeypair();
+  }
+
+  static async restoreWalletFromMnemonic(mnemonic: string): Promise<WalletData> {
+    return this.importFromMnemonic(mnemonic);
   }
 }
