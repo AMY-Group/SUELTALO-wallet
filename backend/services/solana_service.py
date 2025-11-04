@@ -1,20 +1,16 @@
 """
 Solana Devnet Integration Service
-Handles wallet management, token operations, and blockchain interactions
-Uses HTTP RPC API for maximum compatibility
+Handles token management, airdrops, and on-chain verification via HTTP RPC
 """
 
 import httpx
 import base58
-import asyncio
 import json
 from typing import Optional, Dict, Any, Tuple, List
 from datetime import datetime, timedelta
 import logging
-import os
-from pathlib import Path
-import hashlib
 import hmac
+import hashlib
 
 logger = logging.getLogger(__name__)
 
@@ -38,7 +34,7 @@ class TokenAdapter:
     """
     
     def __init__(self, mint_address: str, decimals: int, is_mock: bool = True):
-        self.mint_address = Pubkey.from_string(mint_address)
+        self.mint_address = mint_address
         self.decimals = decimals
         self.is_mock = is_mock
         self.multiplier = 10 ** decimals
@@ -55,49 +51,54 @@ class TokenAdapter:
 class SolanaService:
     """
     Main Solana service for Devnet operations
+    Uses HTTP RPC for blockchain queries and verification
     """
     
     def __init__(self, rpc_url: str = "https://api.devnet.solana.com"):
         self.rpc_url = rpc_url
-        self.client = AsyncClient(rpc_url, commitment=Confirmed)
-        self.treasury_keypair: Optional[Keypair] = None
-        self.slt_mint: Optional[Pubkey] = None
-        self.usdc_mock_mint: Optional[Pubkey] = None
+        self.client = httpx.AsyncClient(timeout=30.0)
+        self.treasury_pubkey: Optional[str] = None
+        self.slt_mint: Optional[str] = None
+        self.usdc_mock_mint: Optional[str] = None
         self.slt_adapter: Optional[TokenAdapter] = None
         self.usdc_adapter: Optional[TokenAdapter] = None
         
         # Airdrop tracking (in production, use Redis)
         self.airdrop_history: Dict[str, list] = {}
         self.processed_signatures: set = set()
+        
+        # Helius webhook secret
+        self.webhook_secret: Optional[str] = None
     
-    async def initialize(self, treasury_private_key: Optional[str] = None):
+    async def initialize(
+        self,
+        treasury_pubkey: str,
+        slt_mint: Optional[str] = None,
+        usdc_mock_mint: Optional[str] = None,
+        webhook_secret: Optional[str] = None
+    ):
         """
         Initialize the service with treasury wallet and token mints
         """
         try:
-            # Load or create treasury keypair
-            if treasury_private_key:
-                # Load from private key (base58 encoded)
-                private_key_bytes = base58.b58decode(treasury_private_key)
-                self.treasury_keypair = Keypair.from_bytes(private_key_bytes)
-            else:
-                # Generate new treasury keypair
-                self.treasury_keypair = Keypair()
-                logger.warning(
-                    f"Generated new treasury keypair: {self.treasury_keypair.pubkey()}"
-                )
-                logger.warning(
-                    f"Private key (save this!): {base58.b58encode(bytes(self.treasury_keypair)).decode()}"
-                )
+            self.treasury_pubkey = treasury_pubkey
+            self.webhook_secret = webhook_secret
             
-            logger.info(f"Treasury wallet: {self.treasury_keypair.pubkey()}")
+            if slt_mint:
+                self.slt_mint = slt_mint
+                self.slt_adapter = TokenAdapter(slt_mint, SLT_DECIMALS, is_mock=False)
+                logger.info(f"SLT mint configured: {slt_mint}")
+            
+            if usdc_mock_mint:
+                self.usdc_mock_mint = usdc_mock_mint
+                self.usdc_adapter = TokenAdapter(usdc_mock_mint, USDC_DECIMALS, is_mock=True)
+                logger.info(f"USDC-MOCK mint configured: {usdc_mock_mint}")
+            
+            logger.info(f"Treasury wallet: {treasury_pubkey}")
             
             # Check treasury balance
-            balance = await self.get_sol_balance(str(self.treasury_keypair.pubkey()))
+            balance = await self.get_sol_balance(treasury_pubkey)
             logger.info(f"Treasury balance: {balance} SOL")
-            
-            if balance < 1.0:
-                logger.warning("Treasury balance low. Consider requesting airdrop.")
             
             return True
             
@@ -105,147 +106,32 @@ class SolanaService:
             logger.error(f"Failed to initialize Solana service: {e}")
             raise
     
-    async def create_slt_token(self) -> str:
+    async def _rpc_call(self, method: str, params: List[Any]) -> Dict[str, Any]:
         """
-        Create SLT token with 6 decimals
-        Treasury wallet has mint and freeze authority
+        Make a JSON-RPC call to Solana
         """
-        try:
-            from spl.token.instructions import initialize_mint, InitializeMintParams
-            from solders.system_program import create_account, CreateAccountParams
-            
-            # Create mint account
-            mint_keypair = Keypair()
-            
-            # Calculate rent
-            from spl.token._layouts import MINT_LAYOUT
-            mint_space = MINT_LAYOUT.sizeof()
-            
-            rent_response = await self.client.get_minimum_balance_for_rent_exemption(mint_space)
-            lamports = rent_response.value
-            
-            # Create account for mint
-            create_account_ix = create_account(
-                CreateAccountParams(
-                    from_pubkey=self.treasury_keypair.pubkey(),
-                    to_pubkey=mint_keypair.pubkey(),
-                    lamports=lamports,
-                    space=mint_space,
-                    owner=TOKEN_PROGRAM_ID,
-                )
-            )
-            
-            # Initialize mint
-            init_mint_ix = initialize_mint(
-                InitializeMintParams(
-                    program_id=TOKEN_PROGRAM_ID,
-                    mint=mint_keypair.pubkey(),
-                    decimals=SLT_DECIMALS,
-                    mint_authority=self.treasury_keypair.pubkey(),
-                    freeze_authority=self.treasury_keypair.pubkey(),
-                )
-            )
-            
-            # Build and send transaction
-            recent_blockhash = (await self.client.get_latest_blockhash()).value.blockhash
-            
-            transaction = Transaction()
-            transaction.recent_blockhash = recent_blockhash
-            transaction.fee_payer = self.treasury_keypair.pubkey()
-            transaction.add(create_account_ix)
-            transaction.add(init_mint_ix)
-            
-            # Sign with both keypairs
-            transaction.sign(self.treasury_keypair, mint_keypair)
-            
-            # Send transaction
-            response = await self.client.send_transaction(transaction)
-            signature = response.value
-            
-            # Confirm transaction
-            await self.client.confirm_transaction(signature)
-            
-            self.slt_mint = mint_keypair.pubkey()
-            self.slt_adapter = TokenAdapter(str(self.slt_mint), SLT_DECIMALS, is_mock=False)
-            
-            logger.info(f"SLT token created: {self.slt_mint}")
-            logger.info(f"Transaction signature: {signature}")
-            
-            return str(self.slt_mint)
-            
-        except Exception as e:
-            logger.error(f"Failed to create SLT token: {e}")
-            raise
-    
-    async def create_usdc_mock_token(self) -> str:
-        """
-        Create USDC-MOCK token with 6 decimals
-        """
-        try:
-            from spl.token.instructions import initialize_mint, InitializeMintParams
-            from solders.system_program import create_account, CreateAccountParams
-            
-            mint_keypair = Keypair()
-            
-            from spl.token._layouts import MINT_LAYOUT
-            mint_space = MINT_LAYOUT.sizeof()
-            
-            rent_response = await self.client.get_minimum_balance_for_rent_exemption(mint_space)
-            lamports = rent_response.value
-            
-            create_account_ix = create_account(
-                CreateAccountParams(
-                    from_pubkey=self.treasury_keypair.pubkey(),
-                    to_pubkey=mint_keypair.pubkey(),
-                    lamports=lamports,
-                    space=mint_space,
-                    owner=TOKEN_PROGRAM_ID,
-                )
-            )
-            
-            init_mint_ix = initialize_mint(
-                InitializeMintParams(
-                    program_id=TOKEN_PROGRAM_ID,
-                    mint=mint_keypair.pubkey(),
-                    decimals=USDC_DECIMALS,
-                    mint_authority=self.treasury_keypair.pubkey(),
-                    freeze_authority=self.treasury_keypair.pubkey(),
-                )
-            )
-            
-            recent_blockhash = (await self.client.get_latest_blockhash()).value.blockhash
-            
-            transaction = Transaction()
-            transaction.recent_blockhash = recent_blockhash
-            transaction.fee_payer = self.treasury_keypair.pubkey()
-            transaction.add(create_account_ix)
-            transaction.add(init_mint_ix)
-            
-            transaction.sign(self.treasury_keypair, mint_keypair)
-            
-            response = await self.client.send_transaction(transaction)
-            signature = response.value
-            
-            await self.client.confirm_transaction(signature)
-            
-            self.usdc_mock_mint = mint_keypair.pubkey()
-            self.usdc_adapter = TokenAdapter(str(self.usdc_mock_mint), USDC_DECIMALS, is_mock=True)
-            
-            logger.info(f"USDC-MOCK token created: {self.usdc_mock_mint}")
-            logger.info(f"Transaction signature: {signature}")
-            
-            return str(self.usdc_mock_mint)
-            
-        except Exception as e:
-            logger.error(f"Failed to create USDC-MOCK token: {e}")
-            raise
+        payload = {
+            "jsonrpc": "2.0",
+            "id": 1,
+            "method": method,
+            "params": params
+        }
+        
+        response = await self.client.post(self.rpc_url, json=payload)
+        response.raise_for_status()
+        
+        result = response.json()
+        
+        if "error" in result:
+            raise Exception(f"RPC Error: {result['error']}")
+        
+        return result.get("result")
     
     async def get_sol_balance(self, address: str) -> float:
         """Get SOL balance for an address"""
         try:
-            pubkey = Pubkey.from_string(address)
-            response = await self.client.get_balance(pubkey)
-            lamports = response.value
+            result = await self._rpc_call("getBalance", [address])
+            lamports = result.get("value", 0)
             return lamports / LAMPORTS_PER_SOL
         except Exception as e:
             logger.error(f"Failed to get SOL balance: {e}")
@@ -254,175 +140,121 @@ class SolanaService:
     async def get_token_balance(self, owner_address: str, mint_address: str) -> float:
         """Get SPL token balance for an address"""
         try:
-            owner_pubkey = Pubkey.from_string(owner_address)
-            mint_pubkey = Pubkey.from_string(mint_address)
+            # Get token accounts by owner
+            result = await self._rpc_call(
+                "getTokenAccountsByOwner",
+                [
+                    owner_address,
+                    {"mint": mint_address},
+                    {"encoding": "jsonParsed"}
+                ]
+            )
             
-            # Get associated token address
-            ata = get_associated_token_address(owner_pubkey, mint_pubkey)
+            accounts = result.get("value", [])
             
-            # Get token account balance
-            response = await self.client.get_token_account_balance(ata)
-            
-            if response.value:
-                amount = int(response.value.amount)
-                decimals = response.value.decimals
-                return amount / (10 ** decimals)
-            else:
+            if not accounts:
                 return 0.0
-                
+            
+            # Get balance from first account
+            account = accounts[0]
+            token_amount = account["account"]["data"]["parsed"]["info"]["tokenAmount"]
+            
+            return float(token_amount["uiAmount"])
+            
         except Exception as e:
             logger.debug(f"No token account found or error: {e}")
             return 0.0
     
-    async def send_sol(
-        self, 
-        from_keypair_bytes: bytes, 
-        to_address: str, 
-        amount: float
-    ) -> Tuple[bool, str]:
+    async def verify_transaction_on_chain(self, signature: str) -> Tuple[bool, Optional[Dict]]:
         """
-        Send SOL from one address to another
+        Verify that a transaction exists and is confirmed on-chain
+        Returns: (is_valid, transaction_details)
         """
         try:
-            from_keypair = Keypair.from_bytes(from_keypair_bytes)
-            to_pubkey = Pubkey.from_string(to_address)
-            
-            lamports = int(amount * LAMPORTS_PER_SOL)
-            
-            # Create transfer instruction
-            transfer_ix = transfer(
-                TransferParams(
-                    from_pubkey=from_keypair.pubkey(),
-                    to_pubkey=to_pubkey,
-                    lamports=lamports,
-                )
+            result = await self._rpc_call(
+                "getTransaction",
+                [
+                    signature,
+                    {
+                        "encoding": "jsonParsed",
+                        "maxSupportedTransactionVersion": 0
+                    }
+                ]
             )
             
-            # Build transaction
-            recent_blockhash = (await self.client.get_latest_blockhash()).value.blockhash
+            if not result:
+                logger.warning(f"Transaction not found: {signature}")
+                return False, None
             
-            transaction = Transaction()
-            transaction.recent_blockhash = recent_blockhash
-            transaction.fee_payer = from_keypair.pubkey()
-            transaction.add(transfer_ix)
+            # Check if transaction was successful
+            meta = result.get("meta", {})
+            if meta.get("err"):
+                logger.warning(f"Transaction failed: {signature}")
+                return False, None
             
-            # Sign transaction
-            transaction.sign(from_keypair)
-            
-            # Send transaction
-            response = await self.client.send_transaction(transaction)
-            signature = response.value
-            
-            # Confirm transaction
-            await self.client.confirm_transaction(signature)
-            
-            logger.info(f"SOL transfer successful: {signature}")
-            return True, str(signature)
+            logger.info(f"Transaction verified on-chain: {signature}")
+            return True, result
             
         except Exception as e:
-            logger.error(f"Failed to send SOL: {e}")
-            return False, str(e)
+            logger.error(f"Failed to verify transaction: {e}")
+            return False, None
     
-    async def send_spl_token(
-        self,
-        from_keypair_bytes: bytes,
-        to_address: str,
-        mint_address: str,
-        amount: float,
-        decimals: int = 6
-    ) -> Tuple[bool, str]:
+    async def get_usdc_transfer_amount(self, transaction_data: Dict) -> Optional[float]:
         """
-        Send SPL token from one address to another
+        Extract USDC transfer amount from a parsed transaction
         """
         try:
-            from_keypair = Keypair.from_bytes(from_keypair_bytes)
-            to_pubkey = Pubkey.from_string(to_address)
-            mint_pubkey = Pubkey.from_string(mint_address)
+            if not self.usdc_mock_mint:
+                return None
             
-            # Get associated token addresses
-            from_ata = get_associated_token_address(from_keypair.pubkey(), mint_pubkey)
-            to_ata = get_associated_token_address(to_pubkey, mint_pubkey)
+            meta = transaction_data.get("meta", {})
+            pre_balances = meta.get("preTokenBalances", [])
+            post_balances = meta.get("postTokenBalances", [])
             
-            # Check if destination ATA exists, create if not
-            to_account_info = await self.client.get_account_info(to_ata)
+            # Find USDC-MOCK transfers
+            for pre, post in zip(pre_balances, post_balances):
+                if pre.get("mint") == self.usdc_mock_mint:
+                    pre_amount = float(pre.get("uiTokenAmount", {}).get("uiAmount", 0))
+                    post_amount = float(post.get("uiTokenAmount", {}).get("uiAmount", 0))
+                    
+                    if post_amount < pre_amount:
+                        # This is the sender
+                        transfer_amount = pre_amount - post_amount
+                        return transfer_amount
             
-            instructions = []
-            
-            if not to_account_info.value:
-                # Create destination ATA
-                create_ata_ix = create_associated_token_account(
-                    payer=from_keypair.pubkey(),
-                    owner=to_pubkey,
-                    mint=mint_pubkey,
-                )
-                instructions.append(create_ata_ix)
-            
-            # Transfer tokens
-            base_amount = int(amount * (10 ** decimals))
-            
-            transfer_ix = spl_transfer(
-                SPLTransferParams(
-                    program_id=TOKEN_PROGRAM_ID,
-                    source=from_ata,
-                    dest=to_ata,
-                    owner=from_keypair.pubkey(),
-                    amount=base_amount,
-                )
-            )
-            instructions.append(transfer_ix)
-            
-            # Build transaction
-            recent_blockhash = (await self.client.get_latest_blockhash()).value.blockhash
-            
-            transaction = Transaction()
-            transaction.recent_blockhash = recent_blockhash
-            transaction.fee_payer = from_keypair.pubkey()
-            
-            for ix in instructions:
-                transaction.add(ix)
-            
-            # Sign transaction
-            transaction.sign(from_keypair)
-            
-            # Send transaction
-            response = await self.client.send_transaction(transaction)
-            signature = response.value
-            
-            # Confirm transaction
-            await self.client.confirm_transaction(signature)
-            
-            logger.info(f"SPL token transfer successful: {signature}")
-            return True, str(signature)
+            return None
             
         except Exception as e:
-            logger.error(f"Failed to send SPL token: {e}")
-            return False, str(e)
+            logger.error(f"Failed to extract USDC amount: {e}")
+            return None
     
-    async def airdrop_slt(
+    async def calculate_slt_reward(self, usdc_amount: float) -> float:
+        """
+        Calculate SLT reward based on USDC transfer
+        """
+        return usdc_amount * AIRDROP_RATE
+    
+    async def validate_airdrop(
         self,
         recipient_address: str,
         amount: float,
         trigger_tx_signature: Optional[str] = None
-    ) -> Tuple[bool, str, Optional[str]]:
+    ) -> Tuple[bool, str]:
         """
-        Airdrop SLT tokens with idempotency, caps, and on-chain verification
-        
-        Returns: (success, message, transaction_signature)
+        Validate airdrop request with idempotency, caps, and verification
+        Returns: (is_valid, message)
         """
         try:
-            if not self.slt_mint:
-                return False, "SLT token not initialized", None
-            
             # Idempotency check
             if trigger_tx_signature:
                 if trigger_tx_signature in self.processed_signatures:
-                    return False, "Transaction already processed (idempotency)", None
+                    return False, "Transaction already processed (idempotency)"
             
             # Amount validation
             base_amount = int(amount * SLT_MULTIPLIER)
             
             if base_amount > SINGLE_AIRDROP_MAX:
-                return False, f"Amount exceeds single airdrop limit ({SINGLE_AIRDROP_MAX / SLT_MULTIPLIER} SLT)", None
+                return False, f"Amount exceeds single airdrop limit ({SINGLE_AIRDROP_MAX / SLT_MULTIPLIER} SLT)"
             
             # Daily cap check
             today = datetime.utcnow().date().isoformat()
@@ -432,159 +264,129 @@ class SolanaService:
             
             if daily_total + base_amount > DAILY_AIRDROP_CAP_PER_USER:
                 remaining = (DAILY_AIRDROP_CAP_PER_USER - daily_total) / SLT_MULTIPLIER
-                return False, f"Daily airdrop cap exceeded. Remaining: {remaining} SLT", None
+                return False, f"Daily airdrop cap exceeded. Remaining: {remaining} SLT"
             
             # On-chain verification if trigger transaction provided
             if trigger_tx_signature:
-                is_valid = await self.verify_transaction_on_chain(trigger_tx_signature)
+                is_valid, tx_data = await self.verify_transaction_on_chain(trigger_tx_signature)
                 if not is_valid:
-                    return False, "Trigger transaction not found or invalid on-chain", None
+                    return False, "Trigger transaction not found or invalid on-chain"
+                
+                # Verify USDC transfer in transaction
+                usdc_amount = await self.get_usdc_transfer_amount(tx_data)
+                if not usdc_amount or usdc_amount <= 0:
+                    return False, "No valid USDC transfer found in transaction"
+                
+                # Verify reward calculation
+                expected_reward = await self.calculate_slt_reward(usdc_amount)
+                if abs(amount - expected_reward) > 0.001:  # Allow small floating point difference
+                    return False, f"Reward amount mismatch. Expected: {expected_reward}, Got: {amount}"
             
-            # Perform airdrop
-            recipient_pubkey = Pubkey.from_string(recipient_address)
+            return True, "Airdrop validated successfully"
             
-            # Get or create recipient's ATA
-            recipient_ata = get_associated_token_address(recipient_pubkey, self.slt_mint)
-            
-            # Check if ATA exists
-            ata_info = await self.client.get_account_info(recipient_ata)
-            
-            instructions = []
-            
-            if not ata_info.value:
-                # Create ATA
-                create_ata_ix = create_associated_token_account(
-                    payer=self.treasury_keypair.pubkey(),
-                    owner=recipient_pubkey,
-                    mint=self.slt_mint,
-                )
-                instructions.append(create_ata_ix)
-            
-            # Mint tokens to recipient
-            mint_ix = mint_to(
-                MintToParams(
-                    program_id=TOKEN_PROGRAM_ID,
-                    mint=self.slt_mint,
-                    dest=recipient_ata,
-                    mint_authority=self.treasury_keypair.pubkey(),
-                    amount=base_amount,
-                )
-            )
-            instructions.append(mint_ix)
-            
-            # Build and send transaction
-            recent_blockhash = (await self.client.get_latest_blockhash()).value.blockhash
-            
-            transaction = Transaction()
-            transaction.recent_blockhash = recent_blockhash
-            transaction.fee_payer = self.treasury_keypair.pubkey()
-            
-            for ix in instructions:
-                transaction.add(ix)
-            
-            transaction.sign(self.treasury_keypair)
-            
-            response = await self.client.send_transaction(transaction)
-            signature = response.value
-            
-            await self.client.confirm_transaction(signature)
+        except Exception as e:
+            logger.error(f"Failed to validate airdrop: {e}")
+            return False, str(e)
+    
+    async def record_airdrop(
+        self,
+        recipient_address: str,
+        amount: float,
+        trigger_tx_signature: Optional[str] = None
+    ) -> bool:
+        """
+        Record an airdrop in the tracking system
+        """
+        try:
+            base_amount = int(amount * SLT_MULTIPLIER)
             
             # Update tracking
             if trigger_tx_signature:
                 self.processed_signatures.add(trigger_tx_signature)
             
+            today = datetime.utcnow().date().isoformat()
+            user_key = f"{recipient_address}:{today}"
+            
             if user_key not in self.airdrop_history:
                 self.airdrop_history[user_key] = []
+            
             self.airdrop_history[user_key].append(base_amount)
             
-            logger.info(f"SLT airdrop successful: {amount} SLT to {recipient_address}")
-            logger.info(f"Transaction signature: {signature}")
-            
-            return True, f"Airdropped {amount} SLT successfully", str(signature)
-            
-        except Exception as e:
-            logger.error(f"Failed to airdrop SLT: {e}")
-            return False, str(e), None
-    
-    async def verify_transaction_on_chain(self, signature: str) -> bool:
-        """
-        Verify that a transaction exists and is confirmed on-chain
-        """
-        try:
-            response = await self.client.get_transaction(
-                signature,
-                encoding="json",
-                max_supported_transaction_version=0
+            logger.info(
+                f"Recorded airdrop: {amount} SLT to {recipient_address} "
+                f"(trigger: {trigger_tx_signature or 'manual'})"
             )
             
-            if response.value is None:
-                logger.warning(f"Transaction not found: {signature}")
-                return False
-            
-            # Check if transaction was successful
-            if response.value.meta and response.value.meta.err:
-                logger.warning(f"Transaction failed: {signature}")
-                return False
-            
-            logger.info(f"Transaction verified on-chain: {signature}")
             return True
             
         except Exception as e:
-            logger.error(f"Failed to verify transaction: {e}")
+            logger.error(f"Failed to record airdrop: {e}")
             return False
     
-    async def request_sol_airdrop(self, address: str, amount: float = 1.0) -> Tuple[bool, str]:
+    def verify_webhook_signature(self, payload: bytes, signature: str) -> bool:
         """
-        Request SOL airdrop from Devnet faucet
+        Verify Helius webhook signature using HMAC
         """
+        if not self.webhook_secret:
+            logger.warning("Webhook secret not configured")
+            return False
+        
         try:
-            pubkey = Pubkey.from_string(address)
-            lamports = int(amount * LAMPORTS_PER_SOL)
+            expected_signature = hmac.new(
+                self.webhook_secret.encode(),
+                payload,
+                hashlib.sha256
+            ).hexdigest()
             
-            response = await self.client.request_airdrop(pubkey, lamports)
-            signature = response.value
-            
-            # Wait for confirmation
-            await self.client.confirm_transaction(signature)
-            
-            logger.info(f"SOL airdrop successful: {amount} SOL to {address}")
-            return True, str(signature)
+            return hmac.compare_digest(expected_signature, signature)
             
         except Exception as e:
-            logger.error(f"Failed to request SOL airdrop: {e}")
-            return False, str(e)
+            logger.error(f"Failed to verify webhook signature: {e}")
+            return False
     
     async def get_transaction_details(self, signature: str) -> Optional[Dict[str, Any]]:
         """
         Get detailed transaction information
         """
         try:
-            response = await self.client.get_transaction(
-                signature,
-                encoding="jsonParsed",
-                max_supported_transaction_version=0
+            result = await self._rpc_call(
+                "getTransaction",
+                [
+                    signature,
+                    {
+                        "encoding": "jsonParsed",
+                        "maxSupportedTransactionVersion": 0
+                    }
+                ]
             )
             
-            if not response.value:
-                return None
-            
-            tx = response.value
-            
-            return {
-                "signature": signature,
-                "slot": tx.slot,
-                "block_time": tx.block_time,
-                "meta": tx.meta,
-                "transaction": tx.transaction,
-            }
+            return result
             
         except Exception as e:
             logger.error(f"Failed to get transaction details: {e}")
             return None
     
+    async def get_recent_airdrop_stats(self, address: str) -> Dict[str, Any]:
+        """
+        Get airdrop statistics for an address
+        """
+        today = datetime.utcnow().date().isoformat()
+        user_key = f"{address}:{today}"
+        
+        daily_total = sum(self.airdrop_history.get(user_key, []))
+        
+        return {
+            "address": address,
+            "date": today,
+            "total_received_today": daily_total / SLT_MULTIPLIER,
+            "remaining_today": (DAILY_AIRDROP_CAP_PER_USER - daily_total) / SLT_MULTIPLIER,
+            "cap_per_day": DAILY_AIRDROP_CAP_PER_USER / SLT_MULTIPLIER,
+            "max_per_transaction": SINGLE_AIRDROP_MAX / SLT_MULTIPLIER
+        }
+    
     async def close(self):
-        """Close the RPC client connection"""
-        await self.client.close()
+        """Close the HTTP client connection"""
+        await self.client.aclose()
 
 
 # Global instance
