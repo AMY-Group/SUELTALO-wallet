@@ -1,103 +1,89 @@
-# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
-
-# IDE and editors
+# IDE / Editors
 .idea/
 .vscode/
 
-# Dependencies
+# Node / Yarn / PNPM
 node_modules/
-/node_modules
-/.pnp
+.pnp
 .pnp.js
-.yarn/install-state.gz
 .yarn/*
 !.yarn/patches
 !.yarn/plugins
 !.yarn/releases
 !.yarn/versions
 
-# Testing
-/coverage
-
-# Next.js
-/.next/
-/out/
-next-env.d.ts
+# Coverage / Build cache
+coverage/
+.cache/
 *.tsbuildinfo
 
-# Production builds
-/build
+# Next.js (por si algún día aparece)
+.next/
+out/
+next-env.d.ts
+
+# Production builds genéricos
+build/
 dist/
-dist
 
-# Environment files (comprehensive coverage)
-
-*token.json*
-*credentials.json*
-
-# Logs and debug files
+# Logs
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 dump.rdb
 
-# System files
+# OS / Certs
 .DS_Store
 *.pem
 
-# Python
+# Python (backend)
 __pycache__/
-*pyc*
+*.pyc
+*.pyo
+*.pyd
 venv/
 .venv/
 
-# Development tools
-chainlit.md
-.chainlit
+# Notebooks / Tools
 .ipynb_checkpoints/
-.ac
+.chainlit/
+chainlit.md
+.ac/
 
-# Deployment
-.vercel
+# Deploy providers
+.vercel/
 
-# Data and databases
+# Mobile / Android SDK cache
+android-sdk/
+
+# Data puntuales de ejemplos (si aplica)
 agenthub/agents/youtube/db
 
-# Archive files and large assets
+# Archivos grandes/archivos de empaquetado
 **/*.zip
-**/*.tar.gz
 **/*.tar
+**/*.tar.gz
 **/*.tgz
 *.pack
 *.deb
 *.dylib
 
-# Build caches
-.cache/
+# -------- ENV FILES (cobertura completa) --------
+# Ignora .env en raíz y en subdirectorios
+.env
+.env.*
+**/.env
+**/.env.*
 
-# Mobile development
-android-sdk/ -e 
-# Environment files
-*.env
-*.env.*
--e 
-# Environment files
-*.env
-*.env.*
--e 
-# Environment files
-*.env
-*.env.*
--e 
-# Environment files
-*.env
-*.env.*
--e 
-# Environment files
-*.env
-*.env.*
--e 
-# Environment files
-*.env
-*.env.*
+# Mantén los ejemplos versionados
+!backend/.env.example
+!frontend/.env.example
+
+# Credenciales sueltas
+*token.json*
+*credentials.json*
+
+# Emergent (auto-generados)
+.emergent/
+emergent.yml

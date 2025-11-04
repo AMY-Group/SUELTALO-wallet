@@ -1,13 +1,36 @@
+# Git / VCS
+.git
+.gitignore
+
+# Node / caches
+node_modules
+**/node_modules
+.cache
+**/.cache
+.yarn
+.pnp
+.pnp.js
+
+# Python
 __pycache__/
 *.pyc
-*.pyo
+venv/
+.venv/
+
+# Builds
+dist
+build
+.next
+out
+
+# Local envs
 .env
-tests/
-.pytest_cache/
-*.log
-.git/
-.gitignore
-README.md
-*.md
-.vscode/
-.idea/
+.env.*
+**/.env
+**/.env.*
+
+# Tools / misc
+.ipynb_checkpoints
+.chainlit
+.emergent
+emergent.yml

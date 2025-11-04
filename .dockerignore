@@ -1,0 +1,11 @@
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.env
+.git
+.emergent
+frontend/
+scripts/.yarn-cache/
+scripts/node_modules/
+backend/.venv/
