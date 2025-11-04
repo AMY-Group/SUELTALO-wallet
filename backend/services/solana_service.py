@@ -394,9 +394,9 @@ class SolanaService:
             "address": address,
             "date": today,
             "total_received_today": daily_total / SLT_MULTIPLIER,
-            "remaining_today": (DAILY_AIRDROP_CAP_PER_USER - daily_total) / SLT_MULTIPLIER,
-            "cap_per_day": DAILY_AIRDROP_CAP_PER_USER / SLT_MULTIPLIER,
-            "max_per_transaction": SINGLE_AIRDROP_MAX / SLT_MULTIPLIER
+            "remaining_today": (USER_DAILY_SLT_CAP - daily_total) / SLT_MULTIPLIER,
+            "cap_per_day": USER_DAILY_SLT_CAP / SLT_MULTIPLIER,
+            "max_per_transaction": MAX_SLT_PER_TX / SLT_MULTIPLIER
         }
     
     async def close(self):
