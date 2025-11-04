@@ -29,18 +29,53 @@ Assets de branding oficiales para SUÉLTALO Crypto Wallet.
 
 ## 🎨 Especificaciones de Diseño
 
-### Colores de Brand
+### Colores de Brand (Official Theme)
 
+```typescript
+// constants/theme.ts
+export const theme = {
+  colors: {
+    bg: "#000000",
+    primary: "#00F5FF",
+    secondary: "#FF00FF",
+    accent: "#8B5CF6",
+    text: "#E5E7EB",
+  },
+  gradient: ["#00F5FF", "#FF00FF", "#8B5CF6"],
+};
 ```
-Degradado Principal:
-- Cyan neón: #00F5FF (inicio)
-- Azul: #0096FF (medio)
-- Purple: #8B5CF6 (medio)
-- Magenta: #FF00FF (final)
 
-Fondo:
-- Negro puro: #000000
+**Paleta de Colores:**
+
+| Color | Hex | Uso |
+|-------|-----|-----|
+| Background | `#000000` | Fondo principal (negro puro) |
+| Primary (Cyan) | `#00F5FF` | Acción principal, links, highlights |
+| Secondary (Magenta) | `#FF00FF` | Acento secundario, notificaciones |
+| Accent (Purple) | `#8B5CF6` | Elementos decorativos, badges |
+| Text | `#E5E7EB` | Texto principal (gris claro) |
+
+**Degradado Neón:**
+```css
+linear-gradient(135deg, #00F5FF 0%, #FF00FF 50%, #8B5CF6 100%)
 ```
+
+### Colores Extendidos
+
+**Estados UI:**
+- Success: `#10B981` (verde)
+- Warning: `#F59E0B` (ámbar)
+- Error: `#EF4444` (rojo)
+- Info: `#3B82F6` (azul)
+
+**Superficie:**
+- Card: `rgba(255, 255, 255, 0.05)`
+- Elevated: `rgba(255, 255, 255, 0.1)`
+- Overlay: `rgba(0, 0, 0, 0.8)`
+
+**Borde:**
+- Default: `rgba(255, 255, 255, 0.1)`
+- Focus: `#00F5FF`
 
 ### Tipografía
 
