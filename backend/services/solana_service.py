@@ -321,6 +321,12 @@ class SolanaService:
             
             self.airdrop_history[user_key].append(base_amount)
             
+            # Update global daily total
+            if today not in self.global_daily_airdrop:
+                self.global_daily_airdrop[today] = 0
+            
+            self.global_daily_airdrop[today] += base_amount
+            
             logger.info(
                 f"Recorded airdrop: {amount} SLT to {recipient_address} "
                 f"(trigger: {trigger_tx_signature or 'manual'})"
