@@ -105,12 +105,48 @@
 user_problem_statement: "Implement Frontend Web3 Integration for SUÉLTALO wallet: real Solana wallet service with BIP39/BIP44, SOL/SPL token transfers, transaction history, and connect UI screens to Devnet backend APIs"
 
 backend:
+  - task: "Devnet Balance Endpoint"
+    implemented: true
+    working: "NA"
+    file: "backend/routes/devnet.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: "NA"
+          agent: "main"
+          comment: "Implementado GET /api/devnet/balance/:address para obtener balances SOL/SLT/USDC desde Devnet. Necesita pruebas."
+
+  - task: "Devnet Verify Transaction Endpoint"
+    implemented: true
+    working: "NA"
+    file: "backend/routes/devnet.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: "NA"
+          agent: "main"
+          comment: "Implementado POST /api/devnet/verify-transaction para verificar transacciones y calcular rewards SLT. Necesita pruebas."
+
+  - task: "Devnet Airdrop Stats Endpoint"
+    implemented: true
+    working: "NA"
+    file: "backend/routes/devnet.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: "NA"
+          agent: "main"
+          comment: "Implementado GET /api/devnet/airdrop-stats/:address para obtener estadísticas de airdrops SLT. Necesita pruebas."
+
   - task: "Health Check Endpoint"
     implemented: true
     working: true
     file: "backend/server.py"
     stuck_count: 0
-    priority: "high"
+    priority: "medium"
     needs_retesting: false
     status_history:
         - working: true
