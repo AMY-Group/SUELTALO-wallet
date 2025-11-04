@@ -117,46 +117,18 @@ export default function DashboardScreen() {
 
   const loadDevnetBalances = async (publicKeyString: string) => {
     try {
-      const pubkey = new PublicKey(publicKeyString);
-      
-      // Get SOL balance
-      const solBalance = await connection.getBalance(pubkey);
-      const solAmount = solBalance / LAMPORTS_PER_SOL;
-      
-      // Get USDC balance
-      let usdcAmount = 0;
-      try {
-        const usdcMint = new PublicKey(USDC_MINT);
-        const usdcATA = await getAssociatedTokenAddress(usdcMint, pubkey);
-        const usdcAccount = await getAccount(connection, usdcATA);
-        usdcAmount = Number(usdcAccount.amount) / Math.pow(10, 6); // USDC has 6 decimals
-      } catch (error) {
-        console.log('USDC account not found or error:', error);
-        usdcAmount = 0;
-      }
-      
-      // Get SLT balance
-      let sltAmount: number | null = null;
-      if (SLT_MINT) {
-        try {
-          const sltMint = new PublicKey(SLT_MINT);
-          const sltATA = await getAssociatedTokenAddress(sltMint, pubkey);
-          const sltAccount = await getAccount(connection, sltATA);
-          sltAmount = Number(sltAccount.amount) / Math.pow(10, 6); // Assuming 6 decimals for SLT
-        } catch (error) {
-          console.log('SLT account not found or error:', error);
-          sltAmount = 0;
-        }
-      }
+      // Use backend API for real-time balances from Devnet
+      const response = await fetch(`${Constants.expoConfig?.extra?.EXPO_PUBLIC_BACKEND_URL}/api/devnet/balance/${publicKeyString}`);
+      const data = await response.json();
       
       const newBalances = {
-        SOL: solAmount,
-        USDC: usdcAmount,
-        SLT: sltAmount,
+        SOL: data.sol_balance || 0,
+        USDC: data.usdc_balance || 0,
+        SLT: data.slt_balance || 0,
       };
       
       setBalances(newBalances);
-      console.info('DASHBOARD_DATA_OK', { sol: solAmount, usdc: usdcAmount, slt: sltAmount });
+      console.info('DASHBOARD_DATA_OK', newBalances);
       
     } catch (error) {
       console.error('Error loading Devnet balances:', error);
