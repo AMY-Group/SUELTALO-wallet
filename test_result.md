@@ -238,12 +238,60 @@ backend:
           comment: "✅ CORS configuration working correctly. Allows cross-origin requests with proper headers."
 
 frontend:
+  - task: "Wallet Service with BIP39/BIP44 (PR-FE1)"
+    implemented: true
+    working: "NA"
+    file: "frontend/services/WalletService.ts, frontend/hooks/useAuthLock.ts"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: "NA"
+          agent: "main"
+          comment: "Implementado servicio real de wallet con BIP39/BIP44 y hook de bloqueo biométrico. Instalar dependencias: bip39, tweetnacl, @noble/ed25519, expo-local-authentication, ed25519-hd-key. Necesita testing."
+
+  - task: "Token Service SOL/SPL (PR-FE2)"
+    implemented: true
+    working: "NA"
+    file: "frontend/services/token.ts"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: "NA"
+          agent: "main"
+          comment: "Implementado servicio de transferencia SOL/SPL con creación automática de ATA, airdrop desde Devnet faucet, y queries de balance. Necesita testing."
+
+  - task: "History Service (PR-FE4)"
+    implemented: true
+    working: "NA"
+    file: "frontend/services/history.ts"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: "NA"
+          agent: "main"
+          comment: "Implementado servicio de historial de transacciones con parsing de TX, links a Solana Explorer. Necesita testing."
+
+  - task: "Home Screen Devnet Integration (PR-FE3 partial)"
+    implemented: true
+    working: "NA"
+    file: "frontend/app/(wallet)/home.tsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: "NA"
+          agent: "main"
+          comment: "Actualizado home.tsx para usar /api/devnet/balance y añadido botón de airdrop SOL. Falta completar send.tsx, rewards.tsx, transactions.tsx."
+
   - task: "Dashboard Black Screen Bug Fix"
     implemented: true
     working: true
     file: "app/dashboard.tsx, app/_layout.tsx, components/ErrorBoundary.tsx"
     stuck_count: 0
-    priority: "high"
+    priority: "medium"
     needs_retesting: false
     status_history:
         - working: false
