@@ -2,7 +2,7 @@
   "name": "frontend",
   "main": "index.js",
   "version": "1.0.0",
-  "packageManager": "yarn@1.22.22",
+  "packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e",
   "engines": {
     "node": ">=18.18 <=20.x"
   },
@@ -25,7 +25,7 @@
     "@solana/web3.js": "^1.98.4",
     "bs58": "^6.0.0",
     "buffer": "^6.0.3",
-    "expo": "~53.0.20",
+    "expo": "^54.0.22",
     "expo-barcode-scanner": "^13.0.1",
     "expo-blur": "~14.1.5",
     "expo-constants": "~17.1.7",
@@ -62,10 +62,9 @@
     "@babel/runtime": "^7.25.0",
     "@types/react": "~19.0.10",
     "eslint": "^9.25.0",
-    "fastestsmallesttextencoderdecoder": "^1.0.22",
     "eslint-config-expo": "~9.2.0",
+    "fastestsmallesttextencoderdecoder": "^1.0.22",
     "typescript": "~5.8.3"
   },
-  "private": true,
-  "packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e"
+  "private": true
 }
