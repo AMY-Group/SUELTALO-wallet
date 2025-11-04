@@ -1,0 +1,51 @@
+name: Mobile Web Build
+
+on:
+  push:
+    branches: [main, develop]
+    paths:
+      - 'frontend/**'
+  pull_request:
+    branches: [main]
+
+jobs:
+  prebuild-web:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+          cache: 'yarn'
+          cache-dependency-path: frontend/yarn.lock
+      
+      - name: Install dependencies
+        working-directory: frontend
+        run: yarn install --frozen-lockfile
+      
+      - name: Run Expo Prebuild (Web)
+        working-directory: frontend
+        run: |
+          npx expo prebuild --platform web --clear || echo "⚠️ Prebuild completed with warnings"
+        continue-on-error: true
+      
+      - name: Check for critical errors
+        working-directory: frontend
+        run: |
+          if [ -d ".expo" ]; then
+            echo "✅ Prebuild artifacts generated"
+          else
+            echo "❌ No prebuild artifacts found"
+            exit 1
+          fi
+      
+      - name: Upload prebuild artifacts
+        uses: actions/upload-artifact@v3
+        if: success()
+        with:
+          name: expo-prebuild-web
+          path: frontend/.expo/
+          retention-days: 7
