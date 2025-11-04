@@ -365,10 +365,7 @@ metadata:
   run_ui: false
 
 test_plan:
-  current_focus:
-    - "Devnet Balance Endpoint"
-    - "Devnet Verify Transaction Endpoint"
-    - "Devnet Airdrop Stats Endpoint"
+  current_focus: []
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
@@ -376,3 +373,5 @@ test_plan:
 agent_communication:
     - agent: "main"
       message: "✅ PR-FE1 & PR-FE2 COMPLETED: Implementados servicios core de wallet (BIP39/BIP44), token transfers (SOL/SPL), y history service. Instaladas todas las dependencias necesarias (bip39, ed25519-hd-key, expo-local-authentication, etc). Actualizado home.tsx con integración básica de Devnet. Endpoints del backend /api/devnet/* ya existen y necesitan testing. Pendiente: completar PR-FE3 (send.tsx, rewards.tsx, transactions.tsx) y PR-FE5 (documentación UAT). Solicito testing de backend Devnet endpoints antes de continuar."
+    - agent: "testing"
+      message: "✅ DEVNET BACKEND TESTING COMPLETED: All Solana Devnet API endpoints are working perfectly. Tested GET /api/devnet/balance/:address (returns SOL/SLT/USDC balances), POST /api/devnet/verify-transaction (validates transactions and calculates SLT rewards), GET /api/devnet/airdrop-stats/:address (tracks daily limits), POST /api/devnet/faucet (provides SOL airdrop instructions), and POST /api/devnet/airdrop-slt (validates and approves SLT airdrops). Fixed minor bug in solana_service.py constants. All endpoints integrate properly with Solana Devnet RPC. Backend is ready for frontend integration. 100% test success rate (6/6 Devnet tests + 11/11 existing backend tests passed)."
