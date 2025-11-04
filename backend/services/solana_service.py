@@ -67,6 +67,7 @@ class SolanaService:
         # Airdrop tracking (in production, use Redis)
         self.airdrop_history: Dict[str, list] = {}
         self.processed_signatures: set = set()
+        self.global_daily_airdrop: Dict[str, int] = {}  # Track global daily airdrops
         
         # Helius webhook secret
         self.webhook_secret: Optional[str] = None
