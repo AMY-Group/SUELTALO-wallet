@@ -356,6 +356,21 @@ export default function DashboardScreen() {
 
             {/* Big Neon Action Buttons */}
             <Animated.View style={[styles.actionsSection, { opacity: fadeAnim }]}>
+              {balances.SOL < 0.01 && (
+                <TouchableOpacity style={styles.bigActionButton} onPress={handleRequestAirdrop}>
+                  <LinearGradient
+                    colors={['#9945FF', '#BB86FC']}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 1 }}
+                    style={styles.bigButtonGradient}
+                  >
+                    <Text style={styles.bigButtonEmoji}>⚡</Text>
+                    <Text style={styles.bigButtonText}>Obtener SOL</Text>
+                    <Text style={styles.bigButtonSubtext}>Para fees en Devnet</Text>
+                  </LinearGradient>
+                </TouchableOpacity>
+              )}
+
               <TouchableOpacity style={styles.bigActionButton} onPress={handleSend}>
                 <LinearGradient
                   colors={['#1E90FF', '#00BFFF']}
