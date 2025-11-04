@@ -1,9 +1,16 @@
-import Constants from 'expo-constants';
+import config from '../constants/config';
 
-const API_BASE_URL = Constants.expoConfig?.extra?.EXPO_PUBLIC_BACKEND_URL || process.env.EXPO_PUBLIC_BACKEND_URL;
+const API_BASE_URL = config.backendUrl;
+
+function ensureBaseUrl(): asserts API_BASE_URL is string {
+  if (!API_BASE_URL) {
+    throw new Error('BACKEND_URL is not configured. Please set REACT_APP_BACKEND_URL or EXPO_PUBLIC_BACKEND_URL');
+  }
+}
 
 export class ApiService {
   private static getApiUrl(endpoint: string): string {
+    ensureBaseUrl();
     return `${API_BASE_URL}/api${endpoint}`;
   }
 
@@ -13,7 +20,7 @@ export class ApiService {
         ...options,
         headers: {
           'Content-Type': 'application/json',
-          ...options.headers,
+          ...(options.headers || {}),
         },
       });
 
@@ -33,10 +40,7 @@ export class ApiService {
   static async createWallet(publicKey: string, address: string) {
     return this.makeRequest(this.getApiUrl('/wallet'), {
       method: 'POST',
-      body: JSON.stringify({
-        public_key: publicKey,
-        address: address,
-      }),
+      body: JSON.stringify({ public_key: publicKey, address }),
     });
   }
 
@@ -80,11 +84,7 @@ export class ApiService {
   static async startKYC(walletAddress: string, email: string, fullName: string) {
     return this.makeRequest(this.getApiUrl('/kyc/start'), {
       method: 'POST',
-      body: JSON.stringify({
-        wallet_address: walletAddress,
-        email: email,
-        full_name: fullName,
-      }),
+      body: JSON.stringify({ wallet_address: walletAddress, email, full_name: fullName }),
     });
   }
 
@@ -96,10 +96,30 @@ export class ApiService {
   static async airdropSLT(walletAddress: string, amount: number) {
     return this.makeRequest(this.getApiUrl('/slt/airdrop'), {
       method: 'POST',
-      body: JSON.stringify({
-        wallet_address: walletAddress,
-        amount: amount,
-      }),
+      body: JSON.stringify({ wallet_address: walletAddress, amount }),
+    });
+  }
+
+  // Devnet endpoints (moved here to avoid direct fetch in screens)
+  static async getDevnetBalance(address: string) {
+    return this.makeRequest(this.getApiUrl(`/devnet/balance/${address}`));
+  }
+
+  static async airdropSltDevnet(walletAddress: string, amount: number) {
+    return this.makeRequest(this.getApiUrl(`/devnet/airdrop-slt`), {
+      method: 'POST',
+      body: JSON.stringify({ wallet_address: walletAddress, amount }),
+    });
+  }
+
+  static async getAirdropStats(address: string) {
+    return this.makeRequest(this.getApiUrl(`/devnet/airdrop-stats/${address}`));
+  }
+
+  static async verifyTransaction(payload: any) {
+    return this.makeRequest(this.getApiUrl(`/devnet/verify-transaction`), {
+      method: 'POST',
+      body: JSON.stringify(payload),
     });
   }
 

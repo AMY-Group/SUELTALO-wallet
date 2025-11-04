@@ -1,5 +1,6 @@
-import { Connection, PublicKey, ParsedTransactionWithMeta, ConfirmedSignatureInfo } from '@solana/web3.js';
+import { PublicKey, ParsedTransactionWithMeta, ConfirmedSignatureInfo } from '@solana/web3.js';
 import { WalletService } from './WalletService';
+import config from '../constants/config';
 
 export interface TransactionHistoryItem {
   signature: string;
@@ -13,12 +14,10 @@ export interface TransactionHistoryItem {
 }
 
 export class HistoryService {
-  // Get recent transaction signatures
   static async getRecentSigs(address: string, limit: number = 20): Promise<ConfirmedSignatureInfo[]> {
     try {
       const connection = WalletService.getConnection();
       const publicKey = new PublicKey(address);
-
       const signatures = await connection.getSignaturesForAddress(publicKey, { limit });
       return signatures;
     } catch (error) {
@@ -27,7 +26,6 @@ export class HistoryService {
     }
   }
 
-  // Get parsed transaction
   static async getParsedTx(signature: string): Promise<ParsedTransactionWithMeta | null> {
     try {
       const connection = WalletService.getConnection();
@@ -39,7 +37,6 @@ export class HistoryService {
     }
   }
 
-  // Parse transaction for display
   static async parseTransaction(
     sig: ConfirmedSignatureInfo,
     userAddress: string
@@ -51,25 +48,21 @@ export class HistoryService {
       const status = sig.confirmationStatus === 'finalized' ? 'finalized' : 'confirmed';
       const timestamp = sig.blockTime || 0;
 
-      // Default values
       let type: 'send' | 'receive' | 'unknown' = 'unknown';
       let token = 'SOL';
       let amount = 0;
       let counterparty = '';
 
-      // Parse instructions
-      const instructions = tx.transaction.message.instructions;
+      const instructions = tx.transaction.message.instructions as any[];
 
       for (const instruction of instructions) {
         if ('parsed' in instruction) {
-          const parsed = instruction.parsed;
+          const parsed = (instruction as any).parsed;
 
-          // SOL Transfer
           if (parsed.type === 'transfer') {
             const info = parsed.info;
             token = 'SOL';
             amount = info.lamports / 1e9;
-            
             if (info.source === userAddress) {
               type = 'send';
               counterparty = info.destination;
@@ -80,19 +73,14 @@ export class HistoryService {
             break;
           }
 
-          // SPL Token Transfer
           if (parsed.type === 'transferChecked' || parsed.type === 'transfer') {
             const info = parsed.info;
-            
-            // Determine token type from mint (simplified)
             if (info.mint) {
               token = 'TOKEN';
             }
-
             if (info.amount) {
               amount = parseFloat(info.amount) / Math.pow(10, info.decimals || 0);
             }
-
             if (info.source) {
               const sourceOwner = info.authority || info.source;
               if (sourceOwner === userAddress) {
@@ -124,22 +112,14 @@ export class HistoryService {
     }
   }
 
-  // Get transaction history with parsed data
-  static async getTransactionHistory(
-    address: string,
-    limit: number = 20
-  ): Promise<TransactionHistoryItem[]> {
+  static async getTransactionHistory(address: string, limit: number = 20): Promise<TransactionHistoryItem[]> {
     try {
       const signatures = await this.getRecentSigs(address, limit);
       const history: TransactionHistoryItem[] = [];
-
       for (const sig of signatures) {
         const item = await this.parseTransaction(sig, address);
-        if (item) {
-          history.push(item);
-        }
+        if (item) history.push(item);
       }
-
       return history;
     } catch (error) {
       console.error('Get transaction history error:', error);
@@ -147,8 +127,9 @@ export class HistoryService {
     }
   }
 
-  // Get Solana Explorer URL (Devnet)
   static getExplorerUrl(signature: string, cluster: string = 'devnet'): string {
-    return `https://explorer.solana.com/tx/${signature}?cluster=${cluster}`;
+    const base = config.explorerBase;
+    if (!base) return '';
+    return `${base}/tx/${signature}?cluster=${cluster}`;
   }
 }
