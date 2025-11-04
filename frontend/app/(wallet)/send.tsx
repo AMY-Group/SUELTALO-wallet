@@ -62,9 +62,16 @@ export default function SendScreen() {
       
       setWalletData(wallet);
       
-      // Load balances
-      const balanceData = await ApiService.getWalletBalance(wallet.publicKey);
-      setBalances(balanceData.balances);
+      // Load balances from Devnet
+      const backendUrl = Constants.expoConfig?.extra?.EXPO_PUBLIC_BACKEND_URL || process.env.EXPO_PUBLIC_BACKEND_URL;
+      const response = await fetch(`${backendUrl}/api/devnet/balance/${wallet.publicKey}`);
+      const data = await response.json();
+      
+      setBalances({
+        SOL: data.sol_balance || 0,
+        USDC: data.usdc_balance || 0,
+        SLT: data.slt_balance || 0,
+      });
     } catch (error) {
       console.error('Error loading wallet data:', error);
     }
