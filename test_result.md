@@ -102,7 +102,7 @@
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
 
-user_problem_statement: "Test the SUÉLTALO Crypto Wallet backend API for health check, wallet management, balance queries, transaction management, KYC mock system, and SLT token rewards functionality"
+user_problem_statement: "Implement Frontend Web3 Integration for SUÉLTALO wallet: real Solana wallet service with BIP39/BIP44, SOL/SPL token transfers, transaction history, and connect UI screens to Devnet backend APIs"
 
 backend:
   - task: "Health Check Endpoint"
