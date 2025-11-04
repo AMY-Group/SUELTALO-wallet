@@ -27,6 +27,12 @@ app = FastAPI(title="SUÉLTALO Crypto Wallet API", version="1.0.0")
 # Create a router with the /api prefix
 api_router = APIRouter(prefix="/api")
 
+# Import Solana service
+from services.solana_service import solana_service
+
+# Import devnet routes
+from routes.devnet import router as devnet_router
+
 # Models
 class WalletCreate(BaseModel):
     public_key: str
