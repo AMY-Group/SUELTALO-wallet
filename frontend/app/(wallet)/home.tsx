@@ -19,6 +19,7 @@ import { Connection, PublicKey, LAMPORTS_PER_SOL } from '@solana/web3.js';
 import { getAssociatedTokenAddress, getAccount } from '@solana/spl-token';
 import Constants from 'expo-constants';
 import { WalletService } from '../../services/WalletService';
+import { TokenService } from '../../services/token';
 import { ApiService } from '../../services/ApiService';
 import { ErrorBoundary } from '../../components/ErrorBoundary';
 
