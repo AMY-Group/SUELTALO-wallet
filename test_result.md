@@ -326,20 +326,20 @@ frontend:
           comment: "✅ Fixed deprecated style warnings. Replaced shadowColor/shadowOffset/shadowOpacity with boxShadow. Replaced Ionicons with emoji placeholders for better stability. Urban LATAM design with neon cards and gradients working correctly."
 
 metadata:
-  created_by: "testing_agent"
-  version: "1.0"
-  test_sequence: 1
+  created_by: "main_agent"
+  version: "2.0"
+  test_sequence: 2
   run_ui: false
 
 test_plan:
   current_focus:
-    - "All backend API endpoints tested and verified"
+    - "Devnet Balance Endpoint"
+    - "Devnet Verify Transaction Endpoint"
+    - "Devnet Airdrop Stats Endpoint"
   stuck_tasks: []
-  test_all: true
+  test_all: false
   test_priority: "high_first"
 
 agent_communication:
-    - agent: "testing"
-      message: "Comprehensive backend API testing completed successfully. All 8 backend tasks tested and verified working. API endpoints responding correctly at https://crypto-sueltalo.preview.emergentagent.com/api. MongoDB integration confirmed working. SLT reward calculations accurate. KYC mock progression system functioning as designed. No critical issues found."
     - agent: "main"
-      message: "✅ CRITICAL BUG FIXED: Resolved the 'Cargando...' infinite loading issue. Problem was SecureStore incompatibility with web builds. Implemented cross-platform storage solution using AsyncStorage for web and SecureStore for native. Updated index.tsx to use correct wallet data key. App now loads correctly and navigates through onboarding flow. All routing works perfectly including splash → welcome → tour screens. Urban LATAM design is rendering beautifully with neon gradients and proper styling."
+      message: "✅ PR-FE1 & PR-FE2 COMPLETED: Implementados servicios core de wallet (BIP39/BIP44), token transfers (SOL/SPL), y history service. Instaladas todas las dependencias necesarias (bip39, ed25519-hd-key, expo-local-authentication, etc). Actualizado home.tsx con integración básica de Devnet. Endpoints del backend /api/devnet/* ya existen y necesitan testing. Pendiente: completar PR-FE3 (send.tsx, rewards.tsx, transactions.tsx) y PR-FE5 (documentación UAT). Solicito testing de backend Devnet endpoints antes de continuar."
