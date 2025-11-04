@@ -11,7 +11,7 @@ from datetime import datetime
 import sys
 
 # API Configuration
-BASE_URL = "https://crypto-sueltalo.preview.emergentagent.com/api/devnet"
+BASE_URL = "https://que-etapa.preview.emergentagent.com/api/devnet"
 HEADERS = {"Content-Type": "application/json"}
 
 # Test Data - Using real Devnet addresses from the review request
