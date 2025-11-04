@@ -175,6 +175,29 @@ export default function DashboardScreen() {
     router.push('/settings');
   };
 
+  const handleRequestAirdrop = async () => {
+    if (!publicKey) return;
+    
+    try {
+      setRefreshing(true);
+      const result = await TokenService.requestAirdrop(publicKey, 1);
+      
+      if (result.success) {
+        Alert.alert('¡Listo! ⚡', 'Te llegó 1 SOL de prueba para pagar fees en Devnet');
+        // Refresh balances
+        await loadDevnetBalances(publicKey);
+        setLastUpdated(new Date());
+      } else {
+        Alert.alert('¡No se pudo!', result.error || 'Intenta otra vez');
+      }
+    } catch (error) {
+      console.error('Airdrop error:', error);
+      Alert.alert('Error', 'No pudimos solicitar el airdrop');
+    } finally {
+      setRefreshing(false);
+    }
+  };
+
   const formatAddress = (address: string) => {
     if (!address) return '';
     return `${address.slice(0, 4)}...${address.slice(-4)}`;
