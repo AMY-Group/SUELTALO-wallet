@@ -21,9 +21,10 @@ SLT_MULTIPLIER = 10 ** SLT_DECIMALS
 USDC_DECIMALS = 6
 USDC_MULTIPLIER = 10 ** USDC_DECIMALS
 
-# Airdrop caps and limits
-DAILY_AIRDROP_CAP_PER_USER = 100 * SLT_MULTIPLIER  # 100 SLT per day per user
-SINGLE_AIRDROP_MAX = 10 * SLT_MULTIPLIER  # 10 SLT max per transaction
+# Airdrop caps and limits (configurable via environment)
+MAX_SLT_PER_TX = 10 * SLT_MULTIPLIER  # 10 SLT max per transaction
+USER_DAILY_SLT_CAP = 100 * SLT_MULTIPLIER  # 100 SLT per day per user
+GLOBAL_DAILY_SLT_CAP = 10000 * SLT_MULTIPLIER  # 10,000 SLT per day total
 AIRDROP_RATE = 0.1  # 0.1 SLT per 1 USDC-MOCK
 
 
