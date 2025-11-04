@@ -18,7 +18,9 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { WalletService } from '../../services/WalletService';
-import { ApiService } from '../../services/ApiService';
+import { TokenService } from '../../services/token';
+import { LAMPORTS_PER_SOL } from '@solana/web3.js';
+import Constants from 'expo-constants';
 
 export default function SendScreen() {
   const router = useRouter();
